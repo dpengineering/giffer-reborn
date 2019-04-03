@@ -447,7 +447,7 @@ function loadExercise(promptForOverwrite) {
         document.getElementById("export-exercise-directions").value = currentExercise.directions;
 
         if(currentExercise.directions) {
-          document.getElementById("directions-content").innerText = currentExercise.directions + "";
+          document.getElementById("directions-content").innerHTML = currentExercise.directions + "";
           $("#output-tabs a[href=\"#directions\"]").tab("show");
         } else {
           document.getElementById("directions-content").innerText = "No directions provided for this Exercise";
