@@ -105,10 +105,12 @@
                     </div>
                   </div>
                   <div class="tab-pane fade" id="dev" role="tabpanel" aria-labelledby="dev-tab">
-                    <button class="btn btn-outline-secondary" onclick="saveExercise()">Export Exercise</button>
+                   <button class="btn btn-outline-secondary" onclick="saveExercise()">Export Exercise</button>
                     <button class="btn btn-outline-secondary" onclick="saveFrameManager()">Export FrameManager</button>
+                    <button class="btn btn-outline-secondary" onclick="generateExerciseModal()">Generate Exercise</button>
                     <hr>
                     <button class="btn btn-info" onclick="showReadme()">Show Help</button>
+                    <button class="btn btn-secondary" onclick="showThemes()">Change Theme</button>                    
                   </div>
                 </div>
               </div>
@@ -160,6 +162,7 @@
   </div>
 </div>
 
+<!-- Modals are the windows that appear over the main page. -->
 
 <div class="modal fade" id="overwrite-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -215,6 +218,135 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="setToStorage('prevent-readme', true)">Don't Show Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="theme-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-title">Change Theme</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row justify-content-center align-items-center">
+          <div class="col-md-auto">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><strong>Theme</strong></span>
+              </div>
+              <select class="form-control theme-selector" id="themes">
+                <option selected value="chrome">Chrome (light)</option>
+                <option value="cobalt">Cobalt (dark)</option>
+                <option value="merbivore_soft">Merbivore (dark)</option>
+                <option value="monokai">Monokai (dark)</option>
+                <option value="xcode">XCode (light)</option>
+              </select>
+            </div>
+          </div class="col">
+          <div class="col-md-auto">
+            <div class="input-group mb-3 has-warning has-feedback">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><strong>Font Size</strong></span>
+              </div>
+              <input type="number" required min="1" max="30" class="form-control font-size-input" aria-label="Font Size" id="font-size" value="14"/> 
+            </div>
+          </div>
+          <div class="col-md-auto">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id=""><strong>Wrap</strong></span>
+              </div>
+              <div class="input-group-append">
+                <div class="input-group-text">
+                  <input type="checkbox" class="big-checkbox wrapping-checkbox" aria-label="Checkbox for following text input" id="wrapping-check" checked>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="applyTheme()">Apply</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="gen-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-title">Generate Exercise</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="input-group mb-3 has-warning has-feedback">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><strong>Exercise</strong></span>
+              </div>
+              <input type="number" required min="1" class="form-control" aria-label="Exercise number" id="genex-number"/>
+               <div class="input-group-append">
+                <button id="fetchButton" type="button" class="btn btn-warning" onclick="fetchExercise(true)">Fetch</button>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><strong>Board Type</strong></span>
+              </div>
+              <select class="form-control" id="genex-board">
+              </select>
+            </div>
+            <div id="genex-edit">
+              <table class="table" id="keyframe-table">
+                <thead>
+                  <tr>
+                    <th>At time (ms)</th>
+                    <th>Change pin</th>
+                    <th>To value</th>
+                    <th>Remove</th>
+                  </tr>
+                </thead>
+                <tbody id="keyframe-table-tbody"></tbody>
+              </table>
+            </div>
+
+            <div class="form-group">
+              <p></p>
+              <label for="genex-directions">Exercise Directions</label>
+              <textarea class="form-control" id="genex-directions" rows="8">
+              Directions go here!
+              </textarea>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group">
+              <label for="genex-starting">Starting code</label>
+              <textarea class="form-control" id="genex-starting"  rows="8">
+                Starting code for students goes here.
+              </textarea>
+            </div>
+            <div class="form-group">
+              <label for="genex-suffix">Complete code</label>
+              <textarea class="form-control" id="genex-complete" rows="8">
+                And here should be a preview of the complete code for the exercise.
+              </textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button id= "genexButton" type="button" class="btn btn-primary" onclick="generateExercise()" disabled>Create Exercise</button>
       </div>
     </div>
   </div>
@@ -302,5 +434,7 @@ int main() {
 <script src="js/Debugger.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/Board.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/main.js" type="text/javascript" charset="utf-8"></script>
+
 </body>
 </html>
+

@@ -113,14 +113,16 @@ Board.prototype.removeKeyframe = function (keyframe) {
   saveContext(); //runs updateInputs
 };
 
-Board.prototype.addKeyframe = function(time, pin, value) {
+Board.prototype.addKeyframe = function(time, pin, value, table) {
   var newContent = $(`<tr class="input-keyframe">
   <td><input type="number" class="form-control keyframe-time" value="0" min="0"/></td>
   <td><input type="number" class="form-control keyframe-pin" value="0" min="0" max="255"/></td>
   <td><input type="number" class="form-control keyframe-value" value="0" min="0" max="1023"/></td>
   <td><button class="btn btn-danger keyframe-remove" onclick="currentBoard.removeKeyframe(this)">-</button></td>
   </tr>`);
-  $("#keyframe-table-tbody").append(newContent);
+  var t = $(table);
+  var c = newContent[0];
+  t.append(c);
 
   if (time) {
     var timeField = newContent.find(".keyframe-time")[0];
@@ -141,11 +143,14 @@ Board.prototype.addKeyframe = function(time, pin, value) {
 
 };
 
-Board.prototype.activate = function(){
-  $("#edit")[0].innerHTML = "";
+Board.prototype.activate = function(idSelected, tableName){
+  // idSelected must be of the form #id, as jQuery dictates.
+  var idContents = $(idSelected)[0];
+  idContents.innerHTML = "";
   this.DOMKeyframes = [];
 
   var setup = $(`
+          <div>
           <table class="table" id="keyframe-table">
             <thead>
               <tr>
@@ -155,16 +160,17 @@ Board.prototype.activate = function(){
                 <th>Remove</th>
               </tr>
             </thead>
-            <tbody id="keyframe-table-tbody"></tbody>
+            <tbody id="` + tableName + `"></tbody>
           </table>
-          <button class="btn btn-success" id="add-keyframe" onclick="currentBoard.addKeyframe(); saveContext()">Add</button>`);
+          <button class="btn btn-success" id="add-keyframe" onclick="currentBoard.addKeyframe(0, 0, 0, '#` + tableName + `'); saveContext()">Add</button>
+          </div>
+          `);
 
-  $("#edit").append(setup);
-
+  idContents.append(setup[0]);
 
   for (var i = 0; i < this.pinKeyframes.length; i++) {
-    var keyframe = this.pinKeyframes[i];
-    this.addKeyframe(keyframe.time, keyframe.pin, keyframe.value);
+     var keyframe = this.pinKeyframes[i];
+     this.addKeyframe(keyframe.time, keyframe.pin, keyframe.value, "#" + tableName);
   }
 };
 
