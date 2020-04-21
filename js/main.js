@@ -198,13 +198,22 @@ function loadBoard(type, setup) {
 
     currentPrefix = currentBoard.codePrefix;
 
+    if (currentBoard.hasCustomCanvas) {
+      var res = currentBoard.getCanvas();
+    } else {
+      var res = document.createElement("canvas");
+    }
+
+    canvas.replaceWith(res);
+    canvas = res;
+
     canvas.height = currentBoard.canvasHeight;
     canvas.width = currentBoard.canvasWidth;
     correctCanvas.height = currentBoard.canvasHeight;
     correctCanvas.width = currentBoard.canvasWidth;
 
-    var ctx = canvas.getContext("2d");
-    var correctCtx = correctCanvas.getContext("2d");
+    var ctx = currentBoard.canvasType ? canvas.getContext(currentBoard.canvasType) : null;
+    var correctCtx = correctBoard.canvasType ? canvas.getContext(correctBoard.canvasType) : null;
 
     currentBoard.drawShield(ctx);
     correctBoard.drawShield(correctCtx);
@@ -698,7 +707,7 @@ function renderFrameManger(frameManager) {
   var currentIndex = 0;
   wait = 0;
 
-  currentBoard.initFrameManager(frameManager);
+  currentBoard.initFrameManager(frameManager, canvas);
   currentBoard.setContext({
     dateString: dateString,
     timeString: timeString,
@@ -706,7 +715,9 @@ function renderFrameManger(frameManager) {
     exerciseNumber: exerciseNumber,
     name: name
   });
-  var currentCtx = canvas.getContext("2d");
+  if (currentBoard.canvasType) {
+    var currentCtx = canvas.getContext(currentBoard.canvasType);
+  }
 
   var drawCorrect = currentExercise.number !== null;
 
@@ -719,7 +730,9 @@ function renderFrameManger(frameManager) {
       exerciseNumber: exerciseNumber,
       name: "Instructor"
     });
-    var correctCtx = correctCanvas.getContext("2d");
+    if (correctBoard.canvasType) {
+      var correctCtx = correctCanvas.getContext(correctBoard.canvasType);
+    }
   }
 
   var drawFrame = function (prev, now) {

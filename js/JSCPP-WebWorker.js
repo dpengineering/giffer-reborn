@@ -4,7 +4,6 @@ importScripts("ArduinoClasses.js");
 var breakpoints = [];
 var frameManager;
 
-
 function pinMode(rt, pin, mode) {
   if (mode > 2) {
     rt.raiseException("Unknown mode " + mode.toString());
@@ -51,7 +50,7 @@ function delay(rt, time) {
   progress(rt, time);
 }
 
-var load = function(rt) {
+var arduinoLoad = function(rt) {
 
   // PIN FUNCTIONS ////////////////////////////////////////////////
 
@@ -220,7 +219,246 @@ var load = function(rt) {
 };
 
 arduino_h = {
-  load: load
+  load: arduinoLoad
+};
+
+function makeFadeState(start, end) {
+  return {type: "fade", start: start, end: end};
+}
+
+function delayUsingKnob(rt, duration) {
+  progress(rt, duration);
+}
+
+function fadeUp(rt, pin, duration) {
+  if (frameManager.getPinMode(pin) !== OUTPUT) {
+    rt.raiseException("Attempted to write to an input pin in fadeUp.");
+    return;
+  }
+  frameManager.setPinState(pin, makeFadeState(0, ANALOG_MAX));
+  progress(rt, duration);
+}
+
+function fadeUpArray(rt, arrayName, arrayLength, duration) {
+  if (arrayLength > arrayName.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < arrayLength; i++) {
+    if (frameManager.getPinMode(arrayName[i]) !== OUTPUT) {
+      rt.raiseException("Attempted to write to an input pin in fadeUpArray.");
+      return;
+    }
+    frameManager.setPinState(arrayName[i], makeFadeState(0, ANALOG_MAX));
+  }
+  progress(rt, duration);
+}
+
+function fadeUpAll(rt, duration) {
+  var all = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  fadeUpArray(rt, all, all.length, duration);
+}
+
+function fadeUpArrayInOrder(rt, arrayName, arrayLength, duration) {
+  if (arrayLength > arrayName.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < arrayLength; i++) {
+    fadeUp(rt, arrayName[i], duration)
+  }
+}
+
+function fadeDown(rt, pin, duration) {
+  if (frameManager.getPinMode(pin) !== OUTPUT) {
+    rt.raiseException("Attempted to write to an input pin in fadeDown.");
+    return;
+  }
+  frameManager.setPinState(pin, makeFadeState(ANALOG_MAX, 0));
+  progress(rt, duration);
+}
+
+function fadeDownArray(rt, arrayName, arrayLength, duration) {
+  if (arrayLength > arrayName.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < arrayLength; i++) {
+    if (frameManager.getPinMode(arrayName[i]) !== OUTPUT) {
+      rt.raiseException("Attempted to write to an input pin in fadeDownArray.");
+      return;
+    }
+    frameManager.setPinState(arrayName[i], makeFadeState(ANALOG_MAX, 0));
+  }
+  progress(rt, duration);
+}
+
+function fadeDownAll(rt, duration) {
+  var all = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+  fadeDownArray(rt, all, all.length, duration);
+}
+
+function fadeDownArrayInOrder(rt, arrayName, arrayLength, duration) {
+  if (arrayLength > arrayName.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < arrayLength; i++) {
+    fadeDown(rt, arrayName[i], duration);
+  }
+}
+
+function blinkArrayInOrder(rt, arrayName, arrayLength, duration) {
+  if (arrayLength > arrayName.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < arrayLength; i++) {
+    fadeUp(rt, arrayName[i], duration);
+    fadeDown(rt, arrayName[i], duration);
+  }
+}
+
+function blinkTwoArraysInOrder(rt, array1, array2, arrayLength, duration) {
+  if (arrayLength > array1.length || arrayLength > array2.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < arrayLength; i++) {
+    fadeUpArray(rt, [array1[i], array2[i]], 2, duration);
+    fadeDownArray(rt, [array1[i], array2[i]], 2, duration);
+  }
+}
+
+function fadeUpTwoArraysInOrder(rt, array1, array2, arrayLength, duration) {
+  if (arrayLength > array1.length || arrayLength > array2.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < arrayLength; i++) {
+    fadeUpArray(rt, [array1[i], array2[i]], 2, duration);
+  }
+}
+
+function fadeDownTwoArraysInOrder(rt, array1, array2, arrayLength, duration) {
+  if (arrayLength > array1.length || arrayLength > array2.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < arrayLength; i++) {
+    fadeDownArray(rt, [array1[i], array2[i]], 2, duration);
+  }
+}
+
+function crossFade(rt, downPin, upPin, duration) {
+  if (frameManager.getPinMode(downPin) !== OUTPUT || frameManager.getPinMode(upPin) !== OUTPUT) {
+    rt.raiseException("Attempted to write to an input pin in crossFade.");
+    return;
+  }
+  frameManager.setPinState(downPin, makeFadeState(ANALOG_MAX, 0));
+  frameManager.setPinState(upPin, makeFadeState(0, ANALOG_MAX));
+  progress(rt, duration);
+}
+
+function crossFadeArrays(rt, downArrayName, downArrayLength, upArrayName, upArrayLength, duration) {
+  if (downArrayLength !== upArrayLength) {
+    rt.raiseException("downArrayLength and upArrayLength are not equal.");
+    return;
+  }
+  if (downArrayLength > downArrayName.length || upArrayLength > upArrayName.length) {
+    rt.raiseException("arrayLength longer than array.");
+    return;
+  }
+  for (var i = 0; i < downArrayLength; i++) {
+    if (frameManager.getPinMode(downArrayName[i]) !== OUTPUT || frameManager.getPinMode(upArrayName[i] !== OUTPUT)) {
+      rt.raiseException("Attempted to write to an input pin in crossFadeArrays.");
+      return;
+    }
+    frameManager.setPinState(downArrayName[i], makeFadeState(ANALOG_MAX, 0));
+    frameManager.setPinState(upArrayName[i], makeFadeState(0, ANALOG_MAX));
+  }
+  progress(rt, duration);
+}
+
+function lightSculptureLoad(rt) {
+  var delayUsingKnob_f = function(rt, _this, duration) {
+    delayUsingKnob(rt, duration.v);
+  };
+  rt.regFunc(delayUsingKnob_f, "global", "delayUsingKnob", [rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeUp_f = function (rt, _this, pin, duration) {
+    fadeUp(rt, pin.v, duration.v);
+  };
+  rt.regFunc(fadeUp_f, "global", "fadeUp", [rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeUpArray_f = function (rt, _this, arrayName, arrayLength, duration) {
+    fadeUpArray(rt, arrayName.v.target.map(x => x.v), arrayLength.v, duration.v);
+  };
+  rt.regFunc(fadeUpArray_f, "global", "fadeUpArray", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeUpAll_f = function (rt, _this, duration) {
+    fadeUpAll(rt, duration.v);
+  };
+  rt.regFunc(fadeUpAll_f, "global", "fadeUpAll", [rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeUpArrayInOrder_f = function (rt, _this, arrayName, arrayLength, duration) {
+    fadeUpArrayInOrder(rt, arrayName.v.target.map(x => x.v), arrayLength.v, duration.v);
+  };
+  rt.regFunc(fadeUpArrayInOrder_f, "global", "fadeUpArrayInOrder", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeDown_f = function (rt, _this, pin, duration) {
+    fadeDown(rt, pin.v, duration.v);
+  };
+  rt.regFunc(fadeDown_f, "global", "fadeDown", [rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeDownArray_f = function (rt, _this, arrayName, arrayLength, duration) {
+    fadeDownArray(rt, arrayName.v.target.map(x => x.v), arrayLength.v, duration.v);
+  };
+  rt.regFunc(fadeDownArray_f, "global", "fadeDownArray", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeDownAll_f = function (rt, _this, duration) {
+    fadeDownAll(rt, duration.v);
+  };
+  rt.regFunc(fadeDownAll_f, "global", "fadeDownAll", [rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeDownArrayInOrder_f = function (rt, _this, arrayName, arrayLength, duration) {
+    fadeDownArrayInOrder(rt, arrayName.v.target.map(x => x.v), arrayLength.v, duration.v);
+  };
+  rt.regFunc(fadeDownArrayInOrder_f, "global", "fadeDownArrayInOrder", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var blinkArrayInOrder_f = function (rt, _this, arrayName, arrayLength, duration) {
+    blinkArrayInOrder(rt, arrayName.v.target.map(x => x.v), arrayLength.v, duration.v);
+  };
+  rt.regFunc(blinkArrayInOrder_f, "global", "blinkArrayInOrder", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var blinkTwoArraysInOrder_f = function (rt, _this, array1, array2, arrayLength, duration) {
+    blinkTwoArraysInOrder(rt, array1.v.target.map(x => x.v), array2.v.target.map(x => x.v), arrayLength.v, duration.v);
+  };
+  rt.regFunc(blinkTwoArraysInOrder_f, "global", "blinkTwoArraysInOrder", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeUpTwoArraysInOrder_f = function (rt, _this, array1, array2, arrayLength, duration) {
+    fadeUpTwoArraysInOrder(rt, array1.v.target.map(x => x.v), array2.v.target.map(x => x.v), arrayLength.v, duration.v);
+  };
+  rt.regFunc(fadeUpTwoArraysInOrder_f, "global", "fadeUpTwoArraysInOrder", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var fadeDownTwoArraysInOrder_f = function (rt, _this, array1, array2, arrayLength, duration) {
+    fadeDownTwoArraysInOrder(rt, array1.v.target.map(x => x.v), array2.v.target.map(x => x.v), arrayLength.v, duration.v);
+  };
+  rt.regFunc(fadeDownTwoArraysInOrder_f, "global", "fadeDownTwoArraysInOrder", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var crossFade_f = function (rt, _this, downPin, upPin, duration) {
+    crossFade(rt, downPin.v, upPin.v, duration.v);
+  };
+  rt.regFunc(crossFade_f, "global", "crossFade", [rt.unsignedcharTypeLiteral, rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+
+  var crossFadeArrays_f = function (rt, _this, downArrayName, downArrayLength, upArrayName, upArrayLength, duration) {
+    crossFadeArrays(rt, downArrayName.v.target.map(x => x.v), downArrayLength.v, upArrayName.v.target.map(x => x.v), upArrayLength.v, duration.v);
+  };
+  rt.regFunc(crossFadeArrays_f, "global", "crossFadeArrays", [rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.normalPointerType(rt.unsignedcharTypeLiteral), rt.unsignedcharTypeLiteral, rt.unsignedintTypeLiteral], rt.voidTypeLiteral);
+}
+
+lightSculpture_h = {
+  load: lightSculptureLoad
 };
 
 function progress(rt, amount) {
@@ -407,7 +645,8 @@ function messageHandler(event) {
     var debugging = event.data.debugging;
     var config = {
       includes: {
-        "Arduino.h": arduino_h //defined in Arduino.js
+        "Arduino.h": arduino_h, //defined above
+        "LightSculpture.h": lightSculpture_h //defined above
       },
       debug: debugging
     };

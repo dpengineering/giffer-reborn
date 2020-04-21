@@ -22,7 +22,8 @@ function Frame(previousFrame) {
       this.ledModes[prop] = previousFrame.ledModes[prop];
     }
     for (var prop in previousFrame.ledStates) {
-      this.ledStates[prop] = previousFrame.ledStates[prop];
+      var s = previousFrame.ledStates[prop];
+      this.ledStates[prop] = typeof s === "number" ? s : s.end;
     }
     this.postDelay = 0;
   }
@@ -46,6 +47,20 @@ Frame.prototype.getPinState = function (pinNumber) {
     return LOW;
   } else {
     return this.ledStates[pinNumber];
+  }
+};
+
+Frame.prototype.getInterpolatedPinValue = function (pinNumber, dt) {
+  var pinState = this.getPinState(pinNumber);
+  if (typeof pinState === "number") {
+    return pinState;
+  } else {
+    switch (pinState.type) {
+      case "fade":
+        return pinState.start + (pinState.end - pinState.start) * (dt / this.postDelay);
+      default:
+        return 0;
+    }
   }
 };
 

@@ -1,18 +1,1 @@
-# This .gitignore file is only to be used when pushing to the giffer-reborn-public repository!
-# Remove this file when pushing to the giffer-reborn-source-repository.
-
-*~
-*Icon*
-.DS*
-*.ini
-update-gh-pages.sh
-.idea/
-
-*.db
-
-# The following rules are unique to the giffer.
-*.ino
-*.gif
-*.html
-!index.html
-
+.idea/*

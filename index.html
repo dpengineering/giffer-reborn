@@ -223,6 +223,24 @@
   </div>
 </div>
 
+<div class="modal fade" id="sculpture-upload-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Upload Light Sculpture File</h5>
+      </div>
+      <div class="modal-body">
+        Please select a Light Sculpture file to use.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" id="ls-upload-close">Use Default Sculpture</button>
+        <input id="ls-input-file" name="ls-input-file" style="display: none" type="file">
+        <button type="button" id="ls-input-file-btn" class="btn btn-primary" onclick="$('#ls-input-file').click()">Upload .ls File</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="theme-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -247,7 +265,7 @@
                 <option value="xcode">XCode (light)</option>
               </select>
             </div>
-          </div class="col">
+          </div>
           <div class="col-md-auto">
             <div class="input-group mb-3 has-warning has-feedback">
               <div class="input-group-prepend">
@@ -432,6 +450,8 @@ int main() {
 <script src="js/clipboard.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/highlight.pack.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/Debugger.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/three.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/OrbitControls.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/Board.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/main.js" type="text/javascript" charset="utf-8"></script>
 

@@ -102,3 +102,16 @@ void loop()
   Serial.println("Good Bye World");
   delay(10);
 }
+
+// ************************************************BOARD+CONFIGURATION FOOTER BEGIN****************************************************
+//
+// Please do not modify the content of the footer, except for what comes between the triple hashtags (###...###). Thank you!
+// If you're curious, the #%! is to help parse the text for the board and configuration information.
+// In the following line of commented code, please ensure that the board type is correct (either "LED Board" or "KS Board").
+// If you would like additional digital or analog inputs in the exercise, please enter them with the following format:
+// (Keep in mind that the time is in units of milliseconds and the value can range from 0 to 1023.)
+// EXAMPLE: "board": {"type":"LED Board", "setup":{"pinKeyframes":[{"time":0,"pin":5,"value":0},{"time":2750,"pin":5,"value":260}]}}
+//
+// ACTUAL:#%!"board": {"type":"LED Board", "setup":{"pinKeyframes":[{"time":500,"pin":5,"value":0},{"time":1250,"pin":5,"value":260},{"time":2500,"pin":5,"value":512},{"time":3750,"pin":5,"value":770},{"time":0,"pin":18,"value":0},{"time":500,"pin":18,"value":1023}]}}#%!
+//
+// *************************************************BOARD+CONFIGURATION FOOTER END*****************************************************

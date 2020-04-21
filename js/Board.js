@@ -7,6 +7,8 @@ function Board(setup) {
 
 Board.prototype.canvasWidth = null;
 Board.prototype.canvasHeight = null;
+Board.prototype.canvasType = "2d";
+Board.prototype.hasCustomCanvas = false;
 Board.prototype.context = null;
 Board.prototype.pinKeyframes = [];
 Board.prototype.DOMKeyframes = [];
@@ -69,9 +71,9 @@ Board.prototype.advance = function() {
     this.reset();
     return true;
   } else {
+    this.elapsedTime += this.currentFrame.postDelay;
     this.currentIndex += 1;
     this.currentFrame = this.frameManager.frames[this.currentIndex];
-    this.elapsedTime += this.currentFrame.postDelay;
     return false;
   }
 };
@@ -87,7 +89,7 @@ Board.prototype.render = function(ctx, dt) {
   ctx.globalAlpha = 1;
   ctx.fillStyle = "white";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  this.draw(ctx);
+  this.draw(ctx, this.fractionalTime - this.elapsedTime);
 };
 
 Board.prototype.drawShield = function(ctx) {
@@ -103,7 +105,7 @@ Board.prototype.drawShield = function(ctx) {
   }
 };
 
-Board.prototype.draw = function(ctx, frame, index, frameManager) {
+Board.prototype.draw = function(ctx, frameProgress) {
   this.drawInfo();
 };
 
@@ -194,6 +196,222 @@ Board.prototype.updateInputs = function(){
 /**
   Light Sculpture Board
 **/
+
+var DEFAULT_SCULPTURE = `{"name":"Concentric","programs":{},"poles":[{"rods":[{"r":0,"theta":0,"height":"2.000","color":"W","$$hashKey":"007"},{"r":"0.750","theta":0,"height":"2.000","color":"W","$$hashKey":"008"},{"r":"0.750","theta":90,"height":"2.000","color":"W","$$hashKey":"009"},{"r":"0.750","theta":180,"height":"2.000","color":"W","$$hashKey":"00A"},{"r":"0.750","theta":270,"height":"2.000","color":"W","$$hashKey":"00B"},{"r":"1.500","theta":0,"height":"2.000","color":"W","$$hashKey":"00C"},{"r":"1.500","theta":45,"height":"2.000","color":"W","$$hashKey":"00D"},{"r":"1.500","theta":90,"height":"2.000","color":"W","$$hashKey":"00E"},{"r":"1.500","theta":135,"height":"2.000","color":"W","$$hashKey":"00F"},{"r":"1.500","theta":180,"height":"2.000","color":"W","$$hashKey":"00G"},{"r":"1.500","theta":225,"height":"2.000","color":"W","$$hashKey":"00H"},{"r":"1.500","theta":270,"height":"2.000","color":"W","$$hashKey":"00I"},{"r":"1.500","theta":315,"height":"2.000","color":"W","$$hashKey":"00J"}],"pos":[-2,-2],"$$hashKey":"004"}]}`;
+
+var pendingLSBs = [];
+
+var closeHandler = function () {
+  pendingLSBs.forEach(lsb => lsb.setSculpture(JSON.parse(DEFAULT_SCULPTURE)));
+  pendingLSBs = [];
+  $("#sculpture-upload-modal").modal('hide');
+};
+document.getElementById("ls-upload-close").onclick = closeHandler;
+var fileInput = document.getElementById("ls-input-file");
+var fr = new FileReader();
+fr.onerror = function () {
+  console.log("upload error");
+  closeHandler();
+};
+fr.onload = function (event) {
+  if(event.type === "load") {
+    try {
+      var uploadedLayout = JSON.parse(event.target.result);
+      pendingLSBs.forEach(lsb => lsb.setSculpture(uploadedLayout));
+      pendingLSBs = [];
+      $("#sculpture-upload-modal").modal('hide');
+    } catch (e) {
+      closeHandler();
+    }
+  }
+};
+fileInput.onchange = function (event) {
+  if(fileInput.files.length > 0) {
+    fr.readAsText(fileInput.files[0]);
+  }
+};
+
+function requestSculpture(lsb) {
+  pendingLSBs.push(lsb);
+  $("#sculpture-upload-modal").modal('show');
+}
+
+function LightSculptureBoard(setup) {
+  Board.call(this, setup);
+
+  this.rodsThree = [];
+  this.polesThree = [];
+  this.scene = null;
+  this.camera = null;
+  this.renderer = null;
+  this.controls = null;
+  this.renderPoles = false;
+
+  if (setup && setup.sculptureLayout) {
+    this.setSculpture(setup.sculptureLayout);
+  } else {
+    this.sculptureLayout = null;
+    requestSculpture(this);
+  }
+}
+
+LightSculptureBoard.prototype = Object.create(Board.prototype);
+
+LightSculptureBoard.prototype.imageURL = "img/KS-Shield.png";
+LightSculptureBoard.prototype.type = "Light Sculpture";
+LightSculptureBoard.prototype.canvasWidth = 450;
+LightSculptureBoard.prototype.canvasHeight = 350;
+LightSculptureBoard.prototype.canvasType = null;
+LightSculptureBoard.prototype.hasCustomCanvas = true;
+LightSculptureBoard.prototype.imageWidth = 450;
+LightSculptureBoard.prototype.imageHeight = 255;
+LightSculptureBoard.prototype.codePrefix = Board.prototype.codePrefix + `
+#include "LightSculpture.h"
+`;
+
+LightSculptureBoard.prototype.getSetup = function() {
+  var thing = Board.prototype.getSetup.call(this);
+  thing.sculptureLayout = this.sculptureLayout;
+  return thing;
+};
+
+LightSculptureBoard.prototype.getCanvas = function() {
+  if (!this.renderer) {
+    this.renderer = new THREE.WebGLRenderer({antialias: true});
+  }
+  return this.renderer.domElement;
+};
+
+LightSculptureBoard.prototype.drawShield = function() {
+
+};
+
+LightSculptureBoard.prototype.setSculpture = function(sculpture) {
+  this.sculptureLayout = sculpture;
+
+  this.getCanvas();
+
+  this.scene = new THREE.Scene();
+  this.camera = new THREE.PerspectiveCamera(45, this.canvasWidth / this.canvasHeight, 0.1, 20000);
+  this.renderer.setSize(this.canvasWidth, this.canvasHeight);
+  this.renderer.setFaceCulling(THREE.CullFaceNone);
+
+  this.camera.position.set(-4, 6, 0);
+  this.scene.add(this.camera);
+
+  this.renderer.setClearColor(0xaaaaaa, 1);
+
+  var light = new THREE.PointLight(0xffffff);
+  light.position.set(-10, 10, -10);
+  light.intensity = 0.5;
+  this.scene.add(light);
+
+  var baseGeom = new THREE.CubeGeometry(4, 2, 4);
+  var baseMat = new THREE.MeshPhongMaterial({color: 0xffffff});
+  var base = new THREE.Mesh(baseGeom, baseMat);
+  base.position.set(0, -1, 0);
+  this.scene.add(base);
+
+  this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+
+  this.rodsThree.forEach(function(r) { this.scene.remove(r); });
+  this.rodsThree = [];
+  this.polesThree.forEach(function(p) { this.scene.remove(p); });
+  this.polesThree = [];
+
+  var poles = this.sculptureLayout.poles;
+  for (var i = 0; i < poles.length; i++) {
+    var pole = poles[i];
+    // Yes, I switched the order. No, I don't know why.
+    var x0 = pole.pos[1] + 2, y0 = pole.pos[0] + 2;
+
+    if (this.renderPoles) {
+      var geom = new THREE.CylinderGeometry(0.05, 0.05, 1, 32, 1, false);
+      var material = new THREE.MeshLambertMaterial({color: 0x000000});
+      var mesh = new THREE.Mesh(geom, material);
+      mesh.position.set(x0, 1 / 2, y0);
+      this.scene.add(mesh);
+      this.polesThree.push(mesh);
+    }
+
+    pole.rods.forEach((function(rod) {
+      var angle = -rod.theta * Math.PI / 180 + Math.PI / 2;
+      var x = x0 + rod.r * Math.cos(angle),
+          y = y0 + rod.r * Math.sin(angle),
+          height = rod.height;
+      var geom = new THREE.CylinderGeometry(0.125, 0.125, height, 32, 1, false);
+      var b = 0;
+      var material = makeMaterial(rod.color, b);
+      var mesh = new THREE.Mesh(geom, material);
+      mesh.position.set(x, height / 2 + 0.01, y);
+      mesh.color = rod.color;
+      this.scene.add(mesh);
+      this.rodsThree.push(mesh);
+      if (this.renderPoles) {
+        var lineMat = new THREE.LineBasicMaterial({color: 0x00ff00});
+        var lineGeom = new THREE.Geometry();
+        lineGeom.vertices.push(new THREE.Vector3(x0, 0.01, y0));
+        lineGeom.vertices.push(new THREE.Vector3(x, 0.01, y));
+        var line = new THREE.Line(lineGeom, lineMat);
+        this.scene.add(line);
+        this.polesThree.push(line);
+      }
+    }).bind(this));
+  }
+};
+
+function makeMaterial(color, brightness) {
+  function colorToHex(c, b) {
+    var b = b !== undefined ? b : 255;
+    switch (c) {
+      case 'R':
+        return (b << 16);
+      case 'G':
+        return (b << 8);
+      case 'B':
+        return b;
+      case 'Y':
+        return (b << 16) | (b << 8);
+      case 'O':
+        return (b << 16) | ((b/2) << 8);
+      case 'W':
+        return (b << 16) | (b << 8) | b;
+      default:
+        return 0x000000;
+    }
+  }
+  return new THREE.MeshLambertMaterial({color: 0xffffff,
+    transparent: true,
+    opacity: 0.35,
+    combine: THREE.MixOperation,
+    reflectivity: 0.25,
+    refractionRatio: 0.5,
+    emissive: colorToHex(color, brightness)});
+}
+
+LightSculptureBoard.prototype.render = function (ctx, dt) {
+  this.fractionalTime += dt;
+  while (this.elapsedTime + this.currentFrame.postDelay <= this.fractionalTime) {
+    if (this.advance()) {
+      break;
+    }
+  }
+  this.draw(ctx, this.fractionalTime - this.elapsedTime);
+  this.renderer.render(this.scene, this.camera);
+  this.controls.update();
+};
+
+LightSculptureBoard.prototype.draw = function (ctx, frameProgress) {
+  for (var i = 0; i < this.rodsThree.length; i++) {
+    var rod = this.rodsThree[i];
+    var thing = this.currentFrame.getInterpolatedPinValue(i + 2, frameProgress);
+    rod.material = makeMaterial(rod.color, thing * (255 / ANALOG_MAX));
+  }
+};
+
+/**
+  LED Board
+**/
 function LEDBoard(setup) {
   Board.call(this, setup);
   this.ledLookup = {
@@ -223,7 +441,7 @@ LEDBoard.prototype.canvasHeight = 195;
 LEDBoard.prototype.imageWidth = undefined;
 LEDBoard.prototype.imageHeight = undefined;
 
-LEDBoard.prototype.draw = function(ctx) {
+LEDBoard.prototype.draw = function(ctx, frameProgress) {
   var frame = this.currentFrame;
   var index = this.currentIndex;
   var frameManager = this.frameManager;
@@ -232,9 +450,9 @@ LEDBoard.prototype.draw = function(ctx) {
   this.drawShield(ctx);
 
   for (var i = 2; i <= 15; i++) {
-    if (frame.getPinState(i) >= 1) { //if it's on
+    if (frame.getInterpolatedPinValue(i, frameProgress) >= 1) { //if it's on
       var alpha = (frame.getPinMode(i) === OUTPUT) ? 1 : 0.2; //Make sure it's an output, otherwise dim it
-      alpha *= frame.getPinState(i) / ANALOG_MAX;
+      alpha *= frame.getInterpolatedPinValue(i, frameProgress) / ANALOG_MAX;
       alpha = Math.max(alpha, 0.3); //Clamp it for usability purposes
       var radius = 7;
       var ledDescriptor = this.ledLookup[i];
@@ -335,7 +553,7 @@ KSBoard.prototype.drawInfo = function(ctx, frame, index, frameManager){
   ctx.fillText(gradeText, 200, y + 70);
 };
 
-KSBoard.prototype.draw = function(ctx){
+KSBoard.prototype.draw = function(ctx, frameProgress) {
   var frame = this.currentFrame;
   var index = this.currentIndex;
   var frameManager = this.frameManager;
@@ -344,9 +562,9 @@ KSBoard.prototype.draw = function(ctx){
   this.drawShield(ctx);
 
   //Draw D1
-  if (frame.getPinState(13) >= 1) { //if it's on
+  if (frame.getInterpolatedPinValue(13, frameProgress) >= 1) { //if it's on
     var alpha = (frame.getPinMode(13) === OUTPUT) ? 1 : 0.2; //Make sure it's an output, otherwise dim it
-    alpha *= frame.getPinState(13) / ANALOG_MAX;
+    alpha *= frame.getInterpolatedPinValue(13, frameProgress) / ANALOG_MAX;
     alpha = Math.max(alpha, 0.3); //Clamp it for usability purposes
     ctx.fillStyle = "red";
     ctx.beginPath();
@@ -359,13 +577,13 @@ KSBoard.prototype.draw = function(ctx){
   var g = 0;
   var b = 0;
   if(frame.getPinMode(8) === OUTPUT){
-    r = Math.floor(frame.getPinState(8) * 255 / ANALOG_MAX);
+    r = Math.floor(frame.getInterpolatedPinValue(8, frameProgress) * 255 / ANALOG_MAX);
   }
   if(frame.getPinMode(6) === OUTPUT){
-    g = Math.floor(frame.getPinState(6) * 255 / ANALOG_MAX);
+    g = Math.floor(frame.getInterpolatedPinValue(6, frameProgress) * 255 / ANALOG_MAX);
   }
   if(frame.getPinMode(7) === OUTPUT){
-    b = Math.floor(frame.getPinState(7) * 255 / ANALOG_MAX);
+    b = Math.floor(frame.getInterpolatedPinValue(7, frameProgress) * 255 / ANALOG_MAX);
   }
   ctx.fillStyle = "rgba(" + r + ", " + g + ", " + b + ", " + (Math.max(r,g,b)/255) + ")";
   for (var x = 15; x < 150; x += 53) {
@@ -376,17 +594,17 @@ KSBoard.prototype.draw = function(ctx){
 
   //Draw buttons
   ctx.fillStyle = "saddlebrown";
-  if (frame.getPinState(56) === ANALOG_MAX) {
+  if (frame.getInterpolatedPinValue(56, frameProgress) === ANALOG_MAX) {
     ctx.beginPath();
     ctx.arc(270, 127, 5, 0, 2 * Math.PI);
     ctx.fill();
   }
-  if (frame.getPinState(55) === ANALOG_MAX) {
+  if (frame.getInterpolatedPinValue(55, frameProgress) === ANALOG_MAX) {
     ctx.beginPath();
     ctx.arc(295, 127, 5, 0, 2 * Math.PI);
     ctx.fill();
   }
-  if (frame.getPinState(54) === ANALOG_MAX) {
+  if (frame.getInterpolatedPinValue(54, frameProgress) === ANALOG_MAX) {
     ctx.beginPath();
     ctx.arc(320, 127, 5, 0, 2 * Math.PI);
     ctx.fill();
@@ -438,16 +656,16 @@ KSBoard.prototype.draw = function(ctx){
 
   var speed;
   if (frame.getPinMode(14) === OUTPUT) {
-    speed = frame.getPinMode(12) === OUTPUT ? frame.getPinState(12) : 0;
-    drawMotor(170, 34, frame.getPinState(14) === ANALOG_MAX, speed);
+    speed = frame.getPinMode(12) === OUTPUT ? frame.getInterpolatedPinValue(12, frameProgress) : 0;
+    drawMotor(170, 34, frame.getInterpolatedPinValue(14, frameProgress) === ANALOG_MAX, speed);
   }
   if (frame.getPinMode(15) === OUTPUT) {
-    speed = frame.getPinMode(11) === OUTPUT ? frame.getPinState(11) : 0;
-    drawMotor(415, 34, frame.getPinState(15) === ANALOG_MAX, speed);
+    speed = frame.getPinMode(11) === OUTPUT ? frame.getInterpolatedPinValue(11, frameProgress) : 0;
+    drawMotor(415, 34, frame.getInterpolatedPinValue(15, frameProgress) === ANALOG_MAX, speed);
   }
 
   //Draw US
-  if (frame.getPinState(4) >= 1 && frame.getPinMode(4) === OUTPUT) {
+  if (frame.getInterpolatedPinValue(4, frameProgress) >= 1 && frame.getPinMode(4) === OUTPUT) {
     ctx.strokeStyle = "red";
     for (var i = 140; i > 90; i -= 10) {
       ctx.beginPath();
@@ -455,7 +673,7 @@ KSBoard.prototype.draw = function(ctx){
       ctx.stroke();
     }
   }
-  if (frame.getPinState(3) >= 1 && frame.getPinMode(3) === INPUT) {
+  if (frame.getInterpolatedPinValue(3, frameProgress) >= 1 && frame.getPinMode(3) === INPUT) {
     ctx.strokeStyle = "red";
     for (var i = 140; i > 90; i -= 10) {
       ctx.beginPath();
@@ -469,7 +687,8 @@ KSBoard.prototype.draw = function(ctx){
 
 var BOARDS = {
   "LED Board": LEDBoard,
-  "KS Board": KSBoard
+  "KS Board": KSBoard,
+  "Light Sculpture": LightSculptureBoard
 };
 var imageLoadCallbacks = [];
 var remaining = 0;
@@ -498,7 +717,7 @@ for(var b in BOARDS){
 function createBoard(type, setup) {
   if(type === null || !(type in BOARDS)){
     console.log("Invalid board type -- loading defaultBoard");
-    return new LEDBoard();;
+    return new LEDBoard();
   }
   var m;
   //Thanks javascript...
