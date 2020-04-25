@@ -265,9 +265,17 @@ LightSculptureBoard.prototype.canvasType = null;
 LightSculptureBoard.prototype.hasCustomCanvas = true;
 LightSculptureBoard.prototype.imageWidth = 450;
 LightSculptureBoard.prototype.imageHeight = 255;
-//LightSculptureBoard.prototype.codePrefix = Board.prototype.codePrefix + `
+LightSculptureBoard.prototype.codePrefix = Board.prototype.codePrefix + `
 //#include "LightSculpture.h"
-//`;
+
+void setupLightSculpture() {
+  for (byte pin = 2; pin < 16; pin++) {
+    pinMode(pin, OUTPUT);
+  }
+
+  Serial.begin(9600);
+}
+`;
 
 LightSculptureBoard.prototype.getSetup = function() {
   var thing = Board.prototype.getSetup.call(this);
