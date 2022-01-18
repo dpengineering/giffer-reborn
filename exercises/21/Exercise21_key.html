@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Untitled Document</title>
+</head>
+
+<body>
+<font color="#434f54"><img src="Exercise21.gif" width="110" height="240" alt=""/></font>
+<pre>
+<font color="#434f54">&#47;&#47; ***************ACTIVITIES TO CHECK WHILE GRADING BEGIN*******************</font>
+<font color="#434f54">&#47;&#47;</font>
+<font color="#434f54">&#47;&#47; 1.&#09;LED 8-2 should turn on and off with a 100ms delay between ten times</font>
+<font color="#434f54">&#47;&#47; 2.&#09;Should pause for 4 seconds with all LEDS OFF and then repeat the sequence again</font>
+<font color="#434f54">&#47;&#47; 3.&#09;Verify that nested for loops are used</font>
+<font color="#434f54">&#47;&#47; 4.&#09;Verify that delay(waitTime) is used</font>
+<font color="#434f54">&#47;&#47; 5.&#09;Verify that delay(waitTime*something) is used</font>
+<font color="#434f54">&#47;&#47;</font>
+<font color="#434f54">&#47;&#47; ***************ACTIVITIES TO CHECK WHILE GRADING END*********************</font>
+
+<font color="#00979c">void</font> <font color="#5e6d03">setup</font><font color="#000000">(</font><font color="#000000">)</font>
+<font color="#000000">{</font>
+ &nbsp;<font color="#00979c">int</font> <font color="#000000">ledNumber</font><font color="#000000">;</font> &nbsp;
+ &nbsp;<font color="#5e6d03">for</font><font color="#000000">(</font><font color="#000000">ledNumber</font> <font color="#434f54">=</font> <font color="#000000">2</font><font color="#000000">;</font> <font color="#000000">ledNumber</font> <font color="#434f54">&lt;=</font> <font color="#000000">15</font><font color="#000000">;</font> <font color="#000000">ledNumber</font> <font color="#434f54">++</font><font color="#000000">)</font>
+ &nbsp;<font color="#000000">{</font> 
+ &nbsp;&nbsp;&nbsp;<font color="#d35400">pinMode</font><font color="#000000">(</font><font color="#000000">ledNumber</font><font color="#434f54">,</font> <font color="#00979c">OUTPUT</font><font color="#000000">)</font><font color="#000000">;</font>
+ &nbsp;<font color="#000000">}</font>
+<font color="#000000">}</font>
+
+<font color="#00979c">void</font> <font color="#5e6d03">loop</font><font color="#000000">(</font><font color="#000000">)</font>
+<font color="#000000">{</font>
+ &nbsp;<font color="#00979c">int</font> <font color="#000000">ledNumber</font><font color="#000000">;</font>
+ &nbsp;<font color="#00979c">int</font> <font color="#000000">count</font><font color="#000000">;</font>
+ &nbsp;<font color="#00979c">int</font> <font color="#000000">delayTime</font><font color="#434f54">=</font><font color="#000000">100</font><font color="#000000">;</font>
+ &nbsp;<font color="#5e6d03">for</font><font color="#000000">(</font><font color="#000000">count</font> <font color="#434f54">=</font> <font color="#000000">1</font><font color="#000000">;</font> <font color="#000000">count</font> <font color="#434f54">&lt;=</font> <font color="#000000">10</font><font color="#000000">;</font> <font color="#000000">count</font><font color="#434f54">++</font><font color="#000000">)</font>
+ &nbsp;<font color="#000000">{</font> &nbsp;
+ &nbsp;&nbsp;&nbsp;<font color="#5e6d03">for</font><font color="#000000">(</font><font color="#000000">ledNumber</font> <font color="#434f54">=</font> <font color="#000000">8</font><font color="#000000">;</font> <font color="#000000">ledNumber</font> <font color="#434f54">&gt;=</font> <font color="#000000">2</font><font color="#000000">;</font> <font color="#000000">ledNumber</font><font color="#434f54">--</font><font color="#000000">)</font>
+ &nbsp;&nbsp;&nbsp;<font color="#000000">{</font> 
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">ledNumber</font><font color="#434f54">,</font> <font color="#00979c">HIGH</font><font color="#000000">)</font><font color="#000000">;</font>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">delay</font><font color="#000000">(</font><font color="#000000">delayTime</font><font color="#000000">)</font><font color="#000000">;</font>
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color="#d35400">digitalWrite</font><font color="#000000">(</font><font color="#000000">ledNumber</font><font color="#434f54">,</font> <font color="#00979c">LOW</font><font color="#000000">)</font><font color="#000000">;</font>
+ &nbsp;&nbsp;&nbsp;<font color="#000000">}</font> &nbsp;
+ &nbsp;<font color="#000000">}</font>
+ &nbsp;&nbsp;&nbsp;<font color="#d35400">delay</font><font color="#000000">(</font><font color="#000000">delayTime</font><font color="#434f54">*</font><font color="#000000">40</font><font color="#000000">)</font><font color="#000000">;</font>
+<font color="#000000">}</font>
+</pre>
+</body>
+</html>
