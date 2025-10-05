@@ -173,16 +173,27 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
+
       <div class="modal-body">
-        This exercise provides starting code.  Do you want to overwrite your current code?
+        This exercise provides starting code.<br>
+        Do you want to overwrite your current code?
       </div>
-      <div class="modal-footer">
+
+      <div class="modal-footer d-flex justify-content-between flex-wrap">
         <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="overwriteCode()">Yes</button>
+        <div>
+          <button type="button" class="btn btn-secondary mr-2" data-dismiss="modal" onclick="overwriteCode(true)">
+            Yes (with comments)
+          </button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="overwriteCode(false)">
+            Yes (no comments)
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
 
 <div class="modal fade" id="readme-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
@@ -212,8 +223,7 @@
         At any time during debugging, you can disable breakpoints to finish executing.<br>
         <br><br>
         <h4>Submitting</h4>
-        Once you've solved an exercise, you can click "Copy Page".<br>
-        Then, read the directions in the console for how to submit to NEO.<br>
+        Once you've solved an exercise, save your code in the Google Doc provided by your teacher.<br>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -455,10 +455,24 @@ function runCode(callback) {
 }
 
 
-//Exercises
-function overwriteCode() {
-  editor.setValue(currentExercise.startingCode);
+// //Exercises
+// function overwriteCode() {
+//   editor.setValue(currentExercise.startingCode);
+// }
+
+function overwriteCode(includeComments = false) {
+  let code = currentExercise.startingCode;
+
+  if (!includeComments) {
+    // Remove everything after // on a line
+    code = code.replace(/\/\/.*$/gm, "");
+    // Clean up blank lines
+    code = code.replace(/^\s*[\r\n]/gm, "");
+  }
+
+  editor.setValue(code.trim());
 }
+
 
 function clearExercise() {
   setStatus("Exercise not found.  Gifs will not be graded.", "");
@@ -624,7 +638,7 @@ function loadExercise(promptForOverwrite) {
   xmlhttp.onabort = handleError;
   xmlhttp.ontimeout = handleError;
   xmlhttp.onload = function () {
-    if (this.status === 200) {
+    if (this.status === 200) { // Success!
       var data = JSON.parse(this.responseText);
       document.getElementById("correct-section").style.display = "block";
       if (!data.board) {
