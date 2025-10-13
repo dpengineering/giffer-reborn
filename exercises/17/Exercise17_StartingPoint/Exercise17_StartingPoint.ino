@@ -7,15 +7,14 @@ void setup()
 
 void loop()
 {
-  int waitTime;
-  int count;
-  waitTime = 200;
-  for (count = 1; count <= 4; count++) // This for loop will repeat 4 times time
-  { // LED 2 will blink on / off each time the loop repeats
+  int blinkTime = 200;
+
+  for (int count = 1; count <= 4; count++)  
+  { 
     digitalWrite(2, HIGH);
-    delay(waitTime);
+    delay(blinkTime);
     digitalWrite(2, LOW);
-    delay(waitTime);
+    delay(blinkTime);
   }
-  delay(waitTime * 20);
+  delay(blinkTime * 10);
 }

@@ -1,24 +1,18 @@
 void setup()
 {
-  int ledNumber;
-
-  for(ledNumber = 2; ledNumber <= 15; ledNumber++) // Make pins 2-15 outputs
-  {
-    pinMode(ledNumber, OUTPUT);
+  //This for loop sets all LEDs as OUTPUTs
+  for (int ledNumber = 2; ledNumber <= 15; ledNumber += 1){
+      pinMode(ledNumber, OUTPUT);
   }
- }
+}
 
 void loop()
 {
-  int waitTime;
-  int ledNumber;
-  waitTime = 200;
-
-  for(ledNumber = 15; ledNumber >= 2; ledNumber--)
-  {
-    digitalWrite(ledNumber, HIGH);
-    delay(200);
-    digitalWrite(ledNumber, LOW);
+  int t = 250;
+  
+  for (int ledNumber = 15; ledNumber >= 2; ledNumber --){
+      digitalWrite(ledNumber, HIGH);
+      delay(t);
+      digitalWrite(ledNumber, LOW);
   }
-  delay(4000);
 }

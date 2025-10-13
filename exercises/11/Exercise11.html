@@ -1,55 +1,27 @@
-<p style="line-height: 1; margin-top: 0pt; margin-bottom: 0pt;"><span style="font-size: 12pt;"><b><span style="font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Exercise11: <strong>Using a &quot;while&quot; loop to blink each LED once</strong>.</span></b></span></p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Arduino Lesson</title>
+  <link rel="stylesheet" href="../../css/exercise-directions.css">
+</head>
+<body>
 
-<p style="line-height: 1; margin-top: 0pt; margin-bottom: 0pt;">&nbsp;</p>
-
-<p style="line-height: 1; margin-top: 0pt; margin-bottom: 0pt;"><span style="font-size: 12pt;"><b><i><span style="font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">NEW:</span></i><span style="font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">  <strong><em>Incrementing by more than one x = x +2;</em></strong></span></b></span></p>
-
-<p style="line-height: 1; margin-top: 0pt; margin-bottom: 0pt;">&nbsp;</p>
-
-<p style="line-height: 1; margin-top: 0pt; margin-bottom: 0pt; margin-left: 36pt;"><span style="font-size: 12pt;"><b><i><span style="font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">DESCRIPTION:</span></i></b> <b><i><span style="font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"><strong><em></em></strong>x gets the value of x + 2. Allows us to count up by two.</span></i></b></span></p>
-
-<p style="line-height: 1; margin-top: 0pt; margin-bottom: 0pt;">&nbsp;</p>
-
-<p style="line-height: 1; margin-top: 0pt; margin-bottom: 0pt; margin-left: 36pt;"><span style="font-size: 12pt;"><b><i><span style="font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Other valid options include:</span></i></b></span></p>
-
-<p style="margin-left: .5in;"><strong><em><span style="font-size: 12pt; font-family: 'Arial','sans-serif';">                        x = x + 5; // </span></em></strong><strong><span style="font-size: 12pt; font-family: 'Arial','sans-serif';">x gets the value of x + 5</span></strong></p>
-<p style="margin-left: .5in;"><strong><em><span style="font-size: 12pt; font-family: 'Arial','sans-serif';">                        and so forth</span></em></strong></p>
+  <h1>Even Blinking</h1>
 
 
-<p><span style="font-size: 12pt;"><b><i><span style="font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">ACTIVITIES:</span></i></b></span></p>
-<ol style="margin-top: 0pt; margin-bottom: 0pt; font-size: 13px;">
+  <details>
+    <summary>NEW: Incrementing by more than one <span class="code"> x += 2</span></summary>
+    <div class="description">
+        When you want to increment a variable by more than one, you can use the <code>+=</code> operator. For example, <code>x += 2</code> will increase the value of <code>x</code> by 2 each time it is executed.
+    </div>
+  </details>
 
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt;"><span style="font-family: Arial; color: #000000; background-color:transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Copy the program from Starting Point Exercise11 into the Arduino IDE. </span></span></li>
+  <h2>Hints</h2>
+  <ol class="hints">
+    <li>How can you ensure that only even LED's are lit up? </li>
+  </ol>
 
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt;"><span style="font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Compile and upload this program to the Arduino and verify that LED’s 2 through 15 blink on and off in order with a 200ms delay between each, then the program pauses for 4 seconds and the whole thing starts over again…….</span></span></li>
+</body>
+</html>
 
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Modify the program so that only LED’s 2-8 blink on and off..</span></li>
-
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Modify the program so that LED’s 9-15 blink on and off.</span></li>
-
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Modify the program so that only LED’s 2, 4, 6, 8, 10, 12, 14 blink on and off.</span></li>
-
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Save the completed sketch as YourInitials_Exercise11 in: Documents – Arduino – Exercises</span></li>
-
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Copy the code into the <a href="http://dpengineering.github.io/giffer-reborn/" target="_blank" rel="noopener">Giffer</a> website</span></li>
-
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Enter your <strong><em>name</em></strong> and <strong><em>exercise number.</em></strong></span></li>
-
-<li style="list-style-type: decimal; font-size: 13px; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline;"><span style="font-size: 12pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Select the <strong><i>Run and Grade </i></strong>button.</span></li>
-
-<li><span style="font-size: 12pt; font-family: Arial; color: #000000; background-color:transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"><span face="Arial">Look at the resulting Output image and make sure it is</span> correct (<span style="color: #008000;"><strong style="font-family:Arial, sans-serif !important; font-weight: normal;">Correct</strong></span> at lower part of image)</span></li>
-
-<li><span style="color: #000000; font-family: Arial; font-weight: 300; font-size: 12pt;">If it is Correct -  use the<strong style="font-family:Arial, sans-serif !important; font-weight: normal;"><strong>Copy Page</strong> button to copy the evidence that you have correctly completed the exercise to clipboard.</span></li>
-
-<li><span style="color: #000000; font-family: Arial; font-weight: 300; font-size: 12pt;">Go to <strong style="font-family:Arial, sans-serif !important; font-weight: normal;">CL 10.3.11 Upload Completed Exercise11</strong>:  And upload evidence that you have completed Exercise11</span></li>
-
-<li><span style="color: #000000; font-family: Arial; font-weight: 300; font-size: 12pt;"><strong style="font-family:Arial, sans-serif !important; font-weight: normal;">Click "<strong>Prepare an answer</strong>" on NEO</span></li>
-
-<li><span style="color: #000000; font-family: Arial; font-weight: 300; font-size: 12pt;">Click the "<strong>&lt;&gt;</strong>" (<em>Source code</em>) button.</span></li>
-
-<li><span style="color: #000000; font-family: Arial; font-weight: 300; font-size: 12pt;">Paste by pressing <strong>CTRL + V</strong></span></li>
-
-<li><span style="color: #000000; font-family: Arial; font-weight: 300; font-size: 12pt;"><strong style="font-family:Arial, sans-serif !important; font-weight: normal;">Click </strong>&quot;<strong><em>Save and submit for grading</em></strong>&quot;</span></li>
-
-<li><span style="color: #000000; font-family: Arial; font-weight: 300; font-size: 12pt;">If you made changes to the code in Giffer, then Copy the code from Giffer and paste it into the Arduino and re-save it as: <em>YourInitials_Exercise11 - </em>in your <em>Documents/Arduino/Exercises</em> Folder.</span></li>
-</ol>
