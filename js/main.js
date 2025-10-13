@@ -466,8 +466,6 @@ function overwriteCode(includeComments = false) {
   if (!includeComments) {
     // Remove everything after // on a line
     code = code.replace(/\/\/.*$/gm, "");
-    // Clean up blank lines
-    code = code.replace(/^\s*[\r\n]/gm, "");
   }
 
   editor.setValue(code.trim());
@@ -706,6 +704,15 @@ function wipeExercise() {
   loadExercise();
 }
 loadExercise();
+
+function loadNextExercise() {
+  const input = document.getElementById('exercise-number');
+  let num = parseInt(input.value, 10);
+  if (isNaN(num)) num = 1;
+  else num += 1;
+  input.value = num;
+  loadExercise(true);
+}
 
 //Rendering
 var wait = 0;
