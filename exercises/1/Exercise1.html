@@ -22,6 +22,7 @@
       font-size: 1.2em;
       border-bottom: 2px solid #ccc;
       padding-bottom: 0.3em;
+      color: #c27ba0;
     }
     .code {
       font-family: monospace;
@@ -51,34 +52,29 @@
     ol {
       margin-left: 1.5em;
     }
-    .activities li {
+    .hints li {
       margin-bottom: 0.6em;
     }
   </style>
 </head>
 <body>
 
-  <h1>A program that does nothing.</h1>
+  <h1>Hello LED 2</h1>
 
   <details>
     <summary>NEW: <span class="code">void setup()</span></summary>
     <div class="description">
       <strong>DESCRIPTION:</strong> <br>
-      setup runs <strong>only once</strong> under these conditions:
-      <ol>
-        <li>When the Arduino is turned on</li>
-        <li>When the Arduino is reset (find the reset button)</li>
-        <li>When downloading a program and resetting the Arduino</li>
-        <li>D13 flashes 3 times to indicate successful reset</li>
-      </ol>
+      setup runs <strong>only once</strong> when the program starts.<br>
+      Use it to initialize variables, pin modes, etc.
     </div>
   </details>
 
   <details>
     <summary>NEW: <span class="code">pinMode(2, OUTPUT);</span></summary>
     <div class="description">
-      Enables pin 2 on the Arduino to send enough power to turn on an LED.  
-      Usage: Arduino may now turn on the LED at pin 2, but this does not actually turn it on.  
+      Enables the LED attached to Arduino's #2 pin to OUTPUT light.  
+      <br> Usage: Arduino may now turn on the LED at pin 2, but this does not actually turn it on.  
       For that, you need: <span class="code">digitalWrite(2, HIGH);</span>
     </div>
   </details>
@@ -97,20 +93,10 @@
     </div>
   </details>
 
-  <h2>Activities</h2>
-  <ol class="activities">
-    <li>Copy the program from <em>Starting Point Exercise01</em> into the Arduino IDE. Compile and upload.</li>
-    <li>Verify that no LEDs light up.</li>
-    <li>Save the sketch as <strong>YourInitials_Exercise01</strong> in <code>Documents → Arduino → Exercises</code>.</li>
-    <li>Copy the code into the <a href="http://dpengineering.github.io/giffer-reborn/" target="_blank">Giffer</a> website.</li>
-    <li>Enter your <em>name</em> and <em>exercise number</em>.</li>
-    <li>Select <i>Run and Grade</i>.</li>
-    <li>Check output image shows <span style="color: green;"><strong>Correct</strong></span>.</li>
-    <li>If Correct, use the <strong>Copy Page</strong> button to copy evidence.</li>
-    <li>Upload evidence to <strong>CL 10.3.01 Upload Completed Exercise01</strong>.</li>
-    <li>On Canvas, click “Prepare an answer” → “&lt;&gt;” (Source code) → paste with CTRL+V.</li>
-    <li><strong>Submit</strong></li>
-    <li>If you changed code in Giffer, copy it back to Arduino and re-save as <em>YourInitials_Exercise01</em>.</li>
+  <h2>Hints</h2>
+  <ol class="hints">
+    <li>Use <span class="code">digitalWrite(pin, value);</span></li>
+    <li><a href="https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/">Arduino digitalWrite documentation</a>.</li>
   </ol>
 
 </body>

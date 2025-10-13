@@ -1,12 +1,27 @@
+// ***************ACTIVITIES TO CHECK WHILE GRADING BEGIN*******************
+//
+// 1.	LED2 should go ON for 500ms
+// 2.	Then LED2 OFF for 5 seconds and then repeat
+// 3.	Change name of variable from x => t
+// 4.	Change value of variable t = 500;
+//
+// ***************ACTIVITIES TO CHECK WHILE GRADING END*********************
+
 void setup()
 {
-  pinMode(2, OUTPUT);
+  pinMode(2, OUTPUT); // Enables pin 2 on the Arduino to Send enough power to turn on a LED
 }
 
 void loop()
 {
+  //TODO: Change name of variable from x => t
+  int x = 1000; // creates an integer x with the value 1000
+  
   digitalWrite(2, HIGH);
-  delay(5000); 
+  delay(x); // Arduino evaluates the value of x and delays for x milliseconds
+  digitalWrite(2, LOW);
+  delay(x);                     
+  delay(4500);  // wait 4500ms or 4.5 seconds before going to the next line
 }
 
 // ************************************************BOARD+CONFIGURATION FOOTER BEGIN****************************************************

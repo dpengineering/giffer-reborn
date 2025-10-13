@@ -1,9 +1,15 @@
-void setup()
-{
-  pinMode(2, OUTPUT); // Enables pin 2 on the Arduino to send enough power (current) to turn on LED attached to pin 2
+// The `setup()` function runs once when the Arduino is powered on or reset.
+// It is used to initialize settings, such as pin modes.
+void setup() {
+  // Set pin 2 as an OUTPUT pin.
+  // This allows the Arduino to send signals to external components, like an LED.
+  pinMode(2, OUTPUT);
 }
 
-void loop()
-{
-   delay(5000);  // wait 5000ms or 5 seconds before going to the next line
+// The `loop()` function runs repeatedly after `setup()`.
+// It contains the main logic of the program.
+void loop() {
+  // Wait for 5000 milliseconds (5 seconds) before executing the next instruction.
+  // This creates a delay in the program's execution.
+  delay(5000);
 }

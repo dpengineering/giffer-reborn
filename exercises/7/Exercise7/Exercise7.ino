@@ -1,12 +1,63 @@
+// ***************ACTIVITIES TO CHECK WHILE GRADING BEGIN*******************
+//
+// 1.	LED2 THROUGH LED15 should blink on and off rapidly with a 100ms delay between
+// 2.	Should pause 5 seconds with all LEDS OFF and then repeat the sequence again
+//
+// ***************ACTIVITIES TO CHECK WHILE GRADING END*********************
+
 void setup()
 {
   pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(8, OUTPUT);
 }
 
 void loop()
 {
+  int blinkTime = 100; 
+
   digitalWrite(2, HIGH);
-  delay(5000); 
+  delay(blinkTime);
+  digitalWrite(2, LOW);
+  delay(blinkTime);
+  
+  digitalWrite(3, HIGH);
+  delay(blinkTime);
+  digitalWrite(3, LOW);
+  delay(blinkTime);
+  
+  digitalWrite(4, HIGH);
+  delay(blinkTime);
+  digitalWrite(4, LOW);
+  delay(blinkTime);
+  
+  digitalWrite(5, HIGH);
+  delay(blinkTime);
+  digitalWrite(5, LOW);
+  delay(blinkTime);
+  
+  digitalWrite(6, HIGH);
+  delay(blinkTime);
+  digitalWrite(6, LOW);
+  delay(blinkTime);
+  
+  digitalWrite(7, HIGH);
+  delay(blinkTime);
+  digitalWrite(7, LOW);
+  delay(blinkTime);
+  
+  digitalWrite(8, HIGH);
+  delay(blinkTime);
+  digitalWrite(8, LOW);
+  delay(blinkTime);
+  
+  //TODO: Blink LEDs 9-15
+
+  delay(blinkTime*50);
 }
 
 // ************************************************BOARD+CONFIGURATION FOOTER BEGIN****************************************************
