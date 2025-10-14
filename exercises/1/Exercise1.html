@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Arduino Lesson</title>
+  <style>
+    body {
+      font-family: Roboto, Helvetica, Arial, sans-serif;
+      color: #222;
+      background: #fafafa;
+      line-height: 1.6;
+      margin: 0;
+      padding: 20px;
+    }
+    h1, h2 {
+      margin-top: 1em;
+    }
+    h1 {
+      font-size: 1.6em;
+    }
+    h2 {
+      font-size: 1.2em;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 0.3em;
+      color: #c27ba0;
+    }
+    .code {
+      font-family: monospace;
+      background: #f5f5f5;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    details {
+      margin: 1em 0;
+      padding: 0.8em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+    }
+    details summary {
+      font-weight: bold;
+      color: #0073e6;
+      cursor: pointer;
+    }
+    .description {
+      margin-top: 0.6em;
+      padding-left: 1em;
+      border-left: 3px solid #ddd;
+      font-style: italic;
+      color: #444;
+    }
+    ol {
+      margin-left: 1.5em;
+    }
+    .hints li {
+      margin-bottom: 0.6em;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Hello LED 2</h1>
+
+  <details>
+    <summary>NEW: <span class="code">void setup()</span></summary>
+    <div class="description">
+      <strong>DESCRIPTION:</strong> <br>
+      setup runs <strong>only once</strong> when the program starts.<br>
+      Use it to initialize variables, pin modes, etc.
+    </div>
+  </details>
+
+  <details>
+    <summary>NEW: <span class="code">pinMode(2, OUTPUT);</span></summary>
+    <div class="description">
+      Enables the LED attached to Arduino's #2 pin to OUTPUT light.  
+      <br> Usage: Arduino may now turn on the LED at pin 2, but this does not actually turn it on.  
+      For that, you need: <span class="code">digitalWrite(2, HIGH);</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>NEW: <span class="code">void loop()</span></summary>
+    <div class="description">
+      <span class="code">loop()</span> runs <strong>over and over forever</strong> after <span class="code">setup()</span> finishes.
+    </div>
+  </details>
+
+  <details>
+    <summary>NEW: <span class="code">delay(5000);</span></summary>
+    <div class="description">
+      Tells Arduino to wait 5000ms (5 seconds) before going to the next instruction.
+    </div>
+  </details>
+
+  <h2>Hints</h2>
+  <ol class="hints">
+    <li>Use <span class="code">digitalWrite(pin, value);</span></li>
+    <li><a href="https://docs.arduino.cc/language-reference/en/functions/digital-io/digitalwrite/">Arduino digitalWrite documentation</a>.</li>
+  </ol>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "number": "2",
+  "startingCode": "void setup()\n{\n  pinMode(2, OUTPUT); // Set pin 2 as an OUTPUT\n} // End of setup(), which only runs once, loop() runs repeatedly after this\n\nvoid loop()\n{\n  digitalWrite(2, HIGH); // Turn on the LED attached to pin 2\n  delay(5000);  // wait 5000ms or 5 secs before going to next line\n // End of loop(), which will repeat again from the top\n}",
+  "suffix": "int main() {\n  setup();\n  loop();\n  return 0;\n}\n",
+  "board": {
+    "type": "LED Board",
+    "setup": {
+      "pinKeyframes": []
+    }
+  },
+  "frameManager": {"frames":[{"ledModes":{"2":1,"3":1,"4":1},"ledStates":{"2":1023,"3":1023,"4":1023},"postDelay":5000,"outputText":[]},{"ledModes":{"2":1,"3":1,"4":1},"ledStates":{"2":1023,"3":1023,"4":1023},"postDelay":0,"outputText":[]}],"currentFrame":1,"elapsedTime":5000,"isGraded":true,"grade":true},
+  "directions": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Arduino Lesson</title>\n  <link rel=\"stylesheet\" href=\"../../css/exercise-directions.css\">\n</head>\n<body>\n\n  <h1>Hello to you too LED's 3 and 4</h1>\n\n\n  <details>\n    <summary>NEW: <span class=\"code\">digitalWrite(pin, value)</span></summary>\n    <div class=\"description\">\n      <span class=\"code\">digitalWrite(pin, value)</span> sets the specified pin to either HIGH or LOW. \n      <strong>HIGH</strong> means the pin outputs 5V (or 3.3V on some boards), and <strong>LOW</strong> means the pin outputs 0V.\n      In this case, a HIGH signal turns our LED on, and a LOW signal turns it off.\n    </div>\n  </details>\n\n  <h2>Hints</h2>\n  <ol class=\"hints\">\n    <li>Don't forget to set the appropriate <span class=\"code\">pinMode(pin, value);</span></li>\n  </ol>\n\n</body>\n</html>\n"
+}
