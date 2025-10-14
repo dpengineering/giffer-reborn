@@ -624,6 +624,17 @@ function loadExercise(promptForOverwrite) {
 
   console.log("Loading Exercise " + exerciseNum + "...");
 
+    // Dynamically load the CSS file for exercises
+    function loadCSS(href) {
+      var link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.type = "text/css";
+      link.href = href;
+      document.head.appendChild(link);
+    }
+  
+    loadCSS("/css/exercise-directions.css");
+
   // This bad boy is only looking for a .FrameManager file!
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.open("GET", "exercises/" + $("#exercise-number")[0].value + "/Exercise_" + exerciseNum + ".FrameManager");
