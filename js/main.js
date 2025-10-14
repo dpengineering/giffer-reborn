@@ -633,7 +633,7 @@ function loadExercise(promptForOverwrite) {
       document.head.appendChild(link);
     }
   
-    loadCSS("/css/exercise-directions.css");
+    loadCSS("./css/exercise-directions.css");
 
   // This bad boy is only looking for a .FrameManager file!
   var xmlhttp = new XMLHttpRequest();
