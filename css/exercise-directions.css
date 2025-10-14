@@ -48,4 +48,12 @@ ol {
 }
 .hints li {
   margin-bottom: 0.6em;
+  filter: blur(5px);
+  transition: filter 0.3s ease;
+  cursor: pointer;
+}
+
+.hints li:active,
+.hints li:focus {
+  filter: blur(0);
 }
