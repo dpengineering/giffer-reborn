@@ -121,7 +121,7 @@ exerciseField.onkeyup = function (e) {
 
 //Buttons
 var runButton = document.getElementById("run-button");
-var copyPage = document.getElementById("copy-page");
+var copyPage = document.getElementById("obtain-secret");
 var finishDebug = document.getElementById("finish-debug");
 
 //Canvas
@@ -242,40 +242,113 @@ function loadBoardFromExercise(exercise) {
 loadBoard(getFromStorage("board-type"), getFromStorage("board-setup"));
 
 
+function toHash(string) {
+
+  let hash = 0;
+
+  if (string.length == 0) return hash;
+
+  for (let i = 0; i < string.length; i++) {
+      let char = string.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+  }
+
+  return hash;
+}
+
+// Global array of 22 phrases
+const phrases = [
+  "exampleOne",
+  "exampleTwo",
+  "exampleThree",
+  "exampleFour",
+  "exampleFive",
+  "example6",
+  "example7",
+  "example8",
+  "example9",
+  "example10",
+  "example11",
+  "example12",
+  "example13",
+  "example14",
+  "example15",
+  "example16",
+  "example17",
+  "example18",
+  "example19",
+  "example20",
+  "example21",
+  "example22"
+];
+
+// Helper to calculate shift values from the passphrase
+function getShiftValues(passphrase) {
+  return passphrase.split('').map(char => char.charCodeAt(0) - 'A'.charCodeAt(0));
+}
+
+// Encode a word using the passphrase
+function encodeWord(word, passphrase) {
+  const shifts = getShiftValues(passphrase);
+  return word.split('').map((char, index) => {
+      const shift = shifts[index % shifts.length];
+      const newCharCode = ((char.charCodeAt(0) - 'A'.charCodeAt(0) + shift) % 26) + 'A'.charCodeAt(0);
+      return String.fromCharCode(newCharCode);
+  }).join('');
+}
+
+// Decode a word using the passphrase
+function decodeWord(encodedWord, passphrase) {
+  const shifts = getShiftValues(passphrase);
+  return encodedWord.split('').map((char, index) => {
+      const shift = shifts[index % shifts.length];
+      const newCharCode = ((char.charCodeAt(0) - 'A'.charCodeAt(0) - shift + 26) % 26) + 'A'.charCodeAt(0);
+      return String.fromCharCode(newCharCode);
+  }).join('');
+}
+
 //Clipboard
-new Clipboard("#copy-page", {
+new Clipboard("#obtain-secret", {
   text: function () {
     var outputGif = $("#confirmation-gif").clone()[0];
     if (!outputGif) {
       println("Please generate a graded gif first.", "red");
       return undefined;
     }
-    var preDom = document.createElement("pre");
-    var dom = $(preDom.appendChild(document.createElement("code")));
-    dom[0].class = "cpp";
-    dom.text(editor.getValue());
-    hljs.highlightBlock(dom[0]);
-    var highlightStorage = $("#highlight-storage");
-    highlightStorage.empty();
-    highlightStorage.append(preDom);
-    dom.find("*").each(function (index) {
-      $(this).css("color", window.getComputedStyle(this).getPropertyValue("color"));
-    });
-    var divWrapper = document.createElement("div");
-    divWrapper.appendChild(makeHeading("Confirmation Gif"));
-    divWrapper.appendChild(outputGif);
-    divWrapper.appendChild(document.createElement("br"));
-    divWrapper.appendChild(makeHeading("Code"));
-    divWrapper.appendChild(preDom);
-    divWrapper.appendChild(document.createElement("br"));
-    divWrapper.appendChild(makeHeading("Serial Output"));
-    var out = document.createElement("div");
-    $(out).css("font-family", "monospace");
-    out.innerHTML = lastContent.output.split("\n").slice(0, 30).join("\n");
-    divWrapper.appendChild(out);
-    println("Copied! Go to \"Prepare an answer\" on Neo, then click the \"<>\" button and paste by pressing Control + V ", "green");
+
+    var secret = 67;
+
+    // Access the name input value
+    var nameInput = document.getElementById("name").value;
+    var exerciseNum = document.getElementById("exercise-number").value;
+    var hashedVal = toHash(nameInput);
+    var selectedPhrase = phrases[Math.abs(hashedVal % phrases.length)];
+
+    if (exerciseNum >= 22){
+      var encoded = encodeWord(selectedPhrase.toUpperCase(), nameInput.toUpperCase());
+      console.log(encoded);
+      secret = encoded[exerciseNum - 22];
+      console.log(secret);
+    }
+
+
+
+    // Display the number in the output
+    if (currentBoard.context.isCorrect) {
+      println("Congrats " + nameInput + ", your code is correct!", "green");
+      println("Hash: " + hashedVal + "%= " + hashedVal % phrases.length, "orange");
+      println("Calculated Phrase: " + selectedPhrase, "orange");
+      print("Exercise " + exerciseNum + "'s secret letter is ", "green");
+      println(secret.toString(), "orange");
+      println("Press Ctrl + V to paste it where needed.", "green");
+    } else {
+      println("Oop, your code is incorrect.", "red");
+    }
     showOutput();
-    return divWrapper.innerHTML;
+
+    // Return the number as a string to copy it to the clipboard
+    return secret.toString();
   }
 });
 
