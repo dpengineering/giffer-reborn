@@ -257,30 +257,29 @@ function toHash(string) {
   return hash;
 }
 
-// Global array of 22 phrases
 const phrases = [
-  "exampleOne",
-  "exampleTwo",
-  "exampleThree",
-  "exampleFour",
-  "exampleFive",
-  "example6",
-  "example7",
-  "example8",
-  "example9",
-  "example10",
-  "example11",
-  "example12",
-  "example13",
-  "example14",
-  "example15",
-  "example16",
-  "example17",
-  "example18",
-  "example19",
-  "example20",
-  "example21",
-  "example22"
+  "BRIGHTDAYSCOMETHFAST",
+  "LOVELIVESINYOURHEART",
+  "KINDNESSISALWAYSCOOL",
+  "YOURBESTISGOODENOUGH",
+  "DREAMSNEEDDAILYGRIND",
+  "COURAGEMAKESTRUTHFUL",
+  "HAPPYHEARTSHAREAMORE",
+  "GRATEFULFORSMALLBEST",
+  "BELIEVEINYOUROWNWAYS",
+  "LAUGHTERISEVERYWHERE",
+  "JOYFOUNDINEVERYTHING",
+  "SUCCESSISINSIDEOFALL",
+  "YESTODAYISYOURCHANCE",
+  "LISTENANDGROWDAILYOK",
+  "PEACESTARTSWITHINYOU",
+  "FRIENDSAREGOLDENLOVE",
+  "THINKSOMETHINGGOODOK",
+  "POSITIVITYHELPSUSALL",
+  "YESUNSHINEFOLLOWSYOU",
+  "ADVENTUREAWAITYOUNOW",
+  "BETHELIGHTYOUWISHTOC",
+  "SMALLACTSMEANGREATOK"
 ];
 
 // Helper to calculate shift values from the passphrase
@@ -324,11 +323,12 @@ new Clipboard("#obtain-secret", {
     var exerciseNum = document.getElementById("exercise-number").value;
     var hashedVal = toHash(nameInput);
     var selectedPhrase = phrases[Math.abs(hashedVal % phrases.length)];
+    var startingEx = 30;
 
-    if (exerciseNum >= 22){
+    if (exerciseNum >= startingEx){
       var encoded = encodeWord(selectedPhrase.toUpperCase(), nameInput.toUpperCase());
       console.log(encoded);
-      secret = encoded[exerciseNum - 22];
+      secret = encoded[exerciseNum - startingEx];
       console.log(secret);
     }
 
