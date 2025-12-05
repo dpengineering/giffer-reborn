@@ -307,6 +307,27 @@ function decodeWord(encodedWord, passphrase) {
   }).join('');
 }
 
+// Select the "Obtain Secret" button
+const obtainSecretButton = document.getElementById("obtain-secret");
+
+// Add a click event listener
+obtainSecretButton.addEventListener("click", function () {
+  // Check if the button has already been clicked
+  if (this.dataset.clicked === "true") {
+    // Refresh the page on subsequent clicks
+    location.reload();
+  } else {
+    // Mark the button as clicked
+    this.dataset.clicked = "true";
+
+    // Disable the button to prevent further clicks
+    this.disabled = true;
+
+    // Perform the "Obtain Secret" action here
+    console.log("Secret obtained!");
+  }
+});
+
 //Clipboard
 new Clipboard("#obtain-secret", {
   text: function () {
