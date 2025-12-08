@@ -341,7 +341,7 @@ new Clipboard("#obtain-secret", {
 
     // Access the name input value
     var nameInput = document.getElementById("name").value;
-    var exerciseNum = document.getElementById("exercise-number").value;
+    var exerciseNum = currentExercise.number;//document.getElementById("exercise-number").value;
     var hashedVal = toHash(nameInput);
     var selectedPhrase = phrases[Math.abs(hashedVal % phrases.length)];
     var startingEx = 30;
@@ -352,8 +352,6 @@ new Clipboard("#obtain-secret", {
       secret = encoded[exerciseNum - startingEx];
       console.log(secret);
     }
-
-
 
     // Display the number in the output
     if (currentBoard.context.isCorrect) {
