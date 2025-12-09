@@ -1,47 +1,38 @@
 void setup()
 { 
-  int pinNumber;
-  
-  for(pinNumber = 2; pinNumber <= 15; pinNumber++)
+  for(int pin = 2; pin <= 15; pin++)
   { 
-    pinMode(pinNumber, OUTPUT);
+    pinMode(pin, OUTPUT);
   }
 }
 
 void loop()
 {
-  sequenceLEDs2Through8(300, 300, 5);
+  up(100, 2);
+  down(100, 2);
+  //TODO: Add calls to up and down functions with decreasing onTime values
+  //TODO: Clean up any spaghetti code (Hint: use loops)
+
   delay(3000);
 }
 
-void sequenceLEDs2Through8(int onTime, int offTime, int repeatCount)
+
+void up(int onTime, int repeatCount)
 { 
-  int count;
-  int pinNumber;
-  
-  for(count = 1; count <= repeatCount; count++)
+  for(int count = 1; count <= repeatCount; count++)
   {
-    for(pinNumber = 2; pinNumber <= 8; pinNumber++)
+    for(int ledNum = 2; ledNum <= 8; ledNum++)
     { 
-      digitalWrite(pinNumber, HIGH);
+      digitalWrite(ledNum, HIGH);
+      digitalWrite(ledNum + 7, HIGH);
       delay(onTime);
-      digitalWrite(pinNumber, LOW);
-      delay(offTime);
+      digitalWrite(ledNum, LOW);
+      digitalWrite(ledNum + 7, LOW);
     }
   }
 }
 
-void sequenceLEDsFromLeftToRight(int onTime, int repeatCount)
-{ int count;
-  int pinNumber;
-  
-  for(count = 1; count <= repeatCount; count++)
-  {
-    for(pinNumber = 15; pinNumber >= 2; pinNumber--)
-    { 
-      digitalWrite(pinNumber, HIGH);
-      delay(onTime);
-      digitalWrite(pinNumber, LOW);
-    }
-  }
+//TODO: Rename parameters
+void down(int x, int y){
+  //TODO: Implement this function to light up the LEDs in downward direction
 }

@@ -1,34 +1,42 @@
 void setup()
 { 
-  int pinNumber;
-  
-  for(pinNumber = 2; pinNumber <= 15; pinNumber++)
+  for(int pin = 2; pin <= 15; pin++)
   { 
-    pinMode(pinNumber, OUTPUT);
+    pinMode(pin, OUTPUT);
   }
 }
 
 void loop()
-{
-  sequenceLEDsFromRightToLeft(300, 1);
-  
-  sequenceLEDsFromRightToLeft(40, 3);
+{  
+  clockwise(50, 1);
+  counterclockwise(50, 1);
+  //TODO: Add calls to clockwise and counterclockwise functions with increasing repeat counts
+  //TODO: Clean up any spaghetti code (Hint: use loops)
     
   delay(3000);
 }
 
-void sequenceLEDsFromRightToLeft(int onTime, int repeatCount)
+void clockwise(int onTime, int repeatCount)
 { 
-  int count;
-  int pinNumber;
-  
-  for(count = 1; count <= repeatCount; count++)
+  for(int count = 1; count <= repeatCount; count++)
   {
-    for(pinNumber = 2; pinNumber <= 15; pinNumber++)
+    for(int ledNum = 9; ledNum <= 15; ledNum++)
     { 
-      digitalWrite(pinNumber, HIGH);
+      digitalWrite(ledNum, HIGH);
       delay(onTime);
-      digitalWrite(pinNumber, LOW);
+      digitalWrite(ledNum, LOW);
+    }
+    
+    for(int ledNum = 8; ledNum >= 2; ledNum--)
+    { 
+      digitalWrite(ledNum, HIGH);
+      delay(onTime);
+      digitalWrite(ledNum, LOW);
     }
   }
+}
+
+void counterclockwise(int onTime, int repeatCount)
+{ 
+  //TODO: Implement this function to light up the LEDs in counterclockwise direction
 }

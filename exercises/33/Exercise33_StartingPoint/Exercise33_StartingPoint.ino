@@ -1,31 +1,23 @@
 void setup()
 { 
   pinMode(2, OUTPUT);
-  pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
 }
 
 
 void loop()
 { 
-  int x;
-
-  for(x = 1; x <= 5; x++)
-  { 
-    blinkOnce(100, 2);
-    blinkOnce(100, 3);
-    blinkOnce(100, 4);
-  }
+  blink2(200);
+  blink2(600);
+  blink2(200);
 
   delay(4000);
 }
 
-
-void blinkOnce(int t, int n)
+//TODO: Add a parameter to control the 'repeatCount' of the blinking
+void blink2(int t) 
 { 
-  digitalWrite(n, HIGH);
-  delay(t);
-  digitalWrite(n, LOW);
-  delay(t);
+    digitalWrite(2, HIGH);
+    delay(t);
+    digitalWrite(2, LOW);
+    delay(t);  
 }
-

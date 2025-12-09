@@ -1,25 +1,15 @@
 void setup()
 { 
-  pinMode(2, OUTPUT);
-  pinMode(3, OUTPUT);
+  //TODO: Set pin 2 as an OUTPUT
 }
 
 void loop()
 { 
-  int x;
-
-  for(x = 1; x <= 5; x++)
-  { 
-    blink();
-  }
+  blink2(); // This is a function call
   delay(4000);
 }
 
-void blink()
+void blink2()
 { 
-  digitalWrite(2, HIGH);
-  delay(100);
-  digitalWrite(2, LOW);
-  delay(100);
+  //TODO: Blink LED 2 for 100ms and then turn it off for 100ms
 }
-

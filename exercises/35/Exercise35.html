@@ -1,46 +1,42 @@
-<p style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;"><b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Exercise 35:</span></b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"> Using a parameter to control the number of times a for loop repeats in a function.</span></p>
-<p style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;"> </p>
-<p style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;"><b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">NEW:</span></b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"> Using a parameter to control the number of times a for loop repeats in a function.</span></p>
-<p style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;"> </p>
-<p style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt; margin-left: 36pt;"><b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">EXAMPLE: </span></b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">In the function definition sequenceLEDsFromRightToLeft below - you can see that the integer </span><b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">onTime</span></b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"> is used to control the delay time and the integer </span><b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">repeatCount</span></b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"> is used to control the number of times a for loop repeats in the function sequenceLEDsFromRightToLeft.</span></p>
-<p style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt; margin-left: 36pt;"> </p>
-<p style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt; margin-left: 72pt;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">void sequenceLEDsFromRightToLeft(int <strong>onTime</strong>, int </span><b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">repeatCount</span></b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">)<br />
-  { <br />
-   int count;<br />
-   int pinNumber;<br />
-   <br />
-   for(count = 1; count &lt;= </span><b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">repeatCount</span></b><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">; count++)<br />
-   {<br />
-     for(pinNumber = 2; pinNumber &lt;= 15; pinNumber++)<br />
-     { <br />
-       digitalWrite(pinNumber, HIGH);<br />
-       delay(<strong>onTime</strong>);<br />
-       digitalWrite(pinNumber, LOW);<br />
-     }<br />
-   }<br />
-}</span></p>
-<p style="line-height: 1.38; margin-top: 0pt; margin-bottom: 0pt;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;"><br /></span><b><i><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">ACTIVITIES:</span></i></b></p>
-<ol style="margin-top: 0pt; margin-bottom: 0pt;">
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">When you finish this exercise there will be two custom functions. sequenceLEDsFromRightToLeft, and sequenceLEDsFromLeftToRight</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Copy the program from Starting Point Exercise35 into the Arduino IDE</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Create  a new function named sequenceLEDsFromLeftToRight, that like sequenceLEDsFromRightToLeft uses parameters to control the delay time and the number of times a for loop repeats in the function. Like sequenceLEDsFromRightToLeft that blinks LED 2 - LED 15 in order, sequenceLEDsFromLeftToRight blinks LED 15 - LED 2 in order.</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Modify the function calls in loop() to call </span></li>
-<ol style="margin-top: 0pt; margin-bottom: 0pt;">
-<li style="list-style-type: lower-alpha; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">sequenceLEDsFromRightToLeft with a 200 ms delay and repeatCount of 2</span></li>
-<li style="list-style-type: lower-alpha; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">sequenceLEDsFromLeftToRight with a 200 ms delay and repeatCount of 4</span></li>
-<li style="list-style-type: lower-alpha; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">sequenceLEDsFromRightToLeft with a 500 ms delay and repeatCount of 1</span></li>
-</ol>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">loop() only happens one time then there should be a delay of 3 seconds after which the whole thing starts over again.</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Save the completed sketch as YourInitials_Exercise35 in: Documents – Arduino – Exercises</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Copy the code into the Giffer website</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Enter your name and exercise number.</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Select the Run and Grade button.</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Look at the resulting Output image and make sure it is correct (Correct at lower part of image)</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">If it is Correct - use the Copy Page button to copy the evidence that you have correctly completed the exercise to clipboard.</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Go to CL 10.4.05 Upload Completed Exercise35: And upload evidence that you have completed Exercise35</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Click "Prepare an answer" on NEO</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Click the "&lt;&gt;" (Source code) button.</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Paste by pressing CTRL + V</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">Click "Save and submit for grading"</span></li>
-<li style="list-style-type: decimal; font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre;"><span style="font-size: 11pt; font-family: Arial; color: #000000; background-color: transparent; font-weight: 400; font-variant: normal; text-decoration: none; vertical-align: baseline; white-space: pre-wrap;">If you made changes to the code in Giffer, then Copy the code from Giffer and paste it into the Arduino and re-save it as: YourInitials_Exercise35 - in your Documents/Arduino/Exercises Folder.</span></li>
-</ol>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Arduino Lesson</title>
+  <link rel="stylesheet" href="/css/exercise-directions.css">
+</head>
+<body>
+
+  <h1>Closing Walls and Ticking Clocks</h1>
+
+
+  <details>
+    <summary>NEW: Descriptive Function Names</summary>
+        <div class="description">
+                We can make our code more readable by giving our functions descriptive names. Instead of naming a function blink2, we can name it blinkRightSideUp to indicate that it blinks the right side of the LEDs from bottom to top.
+                <pre><code>
+                    void blinkRightSideUp(int onTime, int offTime)
+                    { 
+                      for (int ledNum = 2; ledNum <= 8; ledNum ++)
+                      {
+                        digitalWrite(ledNum, HIGH);   // turn the LED on (HIGH is the voltage level)
+                        delay(onTime);                // wait for onTime milliseconds
+                        digitalWrite(ledNum, LOW);    // turn the LED off by making the voltage LOW
+                        delay(offTime);               // wait for offTime milliseconds
+                      }
+                    }
+                </code>
+                </pre>
+        </div>
+  </details>
+
+  <h2>Hints</h2>
+  <ol class="hints">
+    <li>Copy and modify the function body of 'clockwise'.</li>
+    <li>Use the playback slider to speed up your troubleshooting.</li>
+    <li>What's the highest number of times you see the clockwise pattern repeating?</li>
+  </ol>
+
+</body>
+</html>
+
