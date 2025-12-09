@@ -51,7 +51,7 @@ label.btn {
     border-radius: 10px;
 }
 
-#copy-page, #finish-debug {
+#obtain-secret, #finish-debug {
     display: none;
 }
 

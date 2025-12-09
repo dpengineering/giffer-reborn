@@ -14815,6 +14815,9 @@ module.exports = {
       mydebugger.src = code;
     }
     result = PEGUtil.parse(ast, code);
+    if (code.includes(":")) {
+      throw "Range-based for loops are not supported. Please use traditional for loops."
+    }
     if (result.error != null) {
       throw "ERROR: Parsing Failure:\n" + PEGUtil.errorMessage(result.error, true);
     }

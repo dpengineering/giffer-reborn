@@ -12,7 +12,7 @@
 <nav class="navbar sticky-top navbar-light bg-light">
   <p class="navbar-brand">Giffer Reborn</p>
   <form class="form-inline my-2 my-lg-0">
-    <button class="btn btn-outline-info my-2 my-sm-0" id="copy-page" type="button">Copy Page</button>
+    <button class="btn btn-outline-info my-2 my-sm-0" id="obtain-secret" type="button">Obtain Secret</button>
     <button class="btn btn-danger my-2 my-sm-0" id='finish-debug' type="button" onclick="debug.stopDebuggingSession()">Finish</button>
     <button class="btn btn-success my-2 my-sm-0" id="run-button" type="button" onclick="runCode()">Run</button>
   </form>
@@ -66,13 +66,13 @@
                     <div class="input-group mb-3">
                       <input type="text" id="exercise-number" class="form-control" placeholder="Exercise Number (leave blank for no grading)">
                       <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" onclick="loadExercise(true)">Load Exercise</button>
+                        <button class="btn btn-outline-secondary" type="button" onclick="loadExercise(true)">Load</button>
                       </div>
                       <div class="input-group-append">
-                        <button class="btn btn-outline-secondary" type="button" onclick="wipeExercise()">Clear Exercise</button>
+                        <button class="btn btn-outline-secondary" type="button" onclick="wipeExercise()">Clear</button>
                       </div>
                         <div class="input-group-append">
-                          <button class="btn btn-outline-secondary" type="button" onclick="loadNextExercise()">Load Next Exercise</button>
+                          <button class="btn btn-outline-secondary" type="button" onclick="loadNextExercise()">Load Next</button>
                         </div>
                     </div>
                   </div>
@@ -123,7 +123,7 @@
               <div class="col-12">
                 <ul class="nav nav-tabs" id="output-tabs">
                   <li class="nav-item">
-                    <a class="nav-link" id="directions-tab" data-toggle="tab" href="#directions" aria-controls="directions" aria-selected="false">Exercise Directions</a>
+                    <a class="nav-link" id="directions-tab" data-toggle="tab" href="#directions" aria-controls="directions" aria-selected="false">Tips & Tricks</a>
                   </li>
                   <li class="nav-item">
                     <a class="nav-link active" id="gif-tab" data-toggle="tab" href="#gif" aria-controls="gif" aria-selected="true">Output Gif</a>
@@ -215,6 +215,7 @@
         To load an exercise, type the exercise number into the exercise field and press load.<br>
         Some exercises provide some starting code! Be sure to load the exercise before you start working.<br>
         If you want to edit the board, or experiment, you should "Clear Exercise".<br>
+        To see what your code is expected to do, click the green "Run & Grade" button at the top.<br>
         <br><br>
         <h4>Debugging</h4>
         Under the "Debugging" tab, there is a checkbox to "Enable Breakpoints".<br>
