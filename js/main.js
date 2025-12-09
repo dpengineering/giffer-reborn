@@ -356,8 +356,6 @@ new Clipboard("#obtain-secret", {
     // Display the number in the output
     if (currentBoard.context.isCorrect) {
       println("Congrats " + nameInput + ", your code is correct!", "green");
-      println("Hash: " + hashedVal + "%= " + hashedVal % phrases.length, "orange");
-      println("Calculated Phrase: " + selectedPhrase, "orange");
       print("Exercise " + exerciseNum + "'s secret letter is ", "green");
       println(secret.toString(), "orange");
       println("Press Ctrl + V to paste it where needed.", "green");
