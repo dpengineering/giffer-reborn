@@ -1,57 +1,40 @@
-//**************ACTIVITIES TO CHECK WHILE GRADING**********BEGIN*********
-//
-// 1.	Make sure that an array named LEDsCounterClockwise has been created and used
-// 2.	Ensure that a function has been created named ArraysSequenceLEDsCounterClockwiseStartAt2
-// 3.	The order of the LED’s should be 2,3,4,5,6,7,8,15,14,13,12,11,10,9
-// 4.	Make sure that function uses three parameters (example – but not required - ledOnTime, ledOffTime, and repeatCount)
-//
-// ***************ACTIVITIES TO CHECK WHILE GRADING END*********************
-
 void setup()
 {
-  int LEDNum;
-
-  for(LEDNum = 2; LEDNum <= 15; LEDNum++)
+  for (int pin=2; pin<=15; pin++)
   {
-    pinMode(LEDNum, OUTPUT);
+    pinMode(pin, OUTPUT);
   }
 }
-
 void loop()
 {
-  ArraysSequenceLEDsCounterClockwiseStartAt2(100,100, 3);
+  int arrLength = 7;
+  int myArray[arrLength] = {2, 4, 6, 8, 10, 12, 14};
+  int t = 200;
+  
+  blinkArray(myArray, arrLength, t);
+  blinkArrayInOrder(myArray, arrLength, t);
 }
 
-void ArraysSequenceLEDsCounterClockwiseStartAt2(int ledOnTime,int ledOffTime, int repeatCount)// Exercise 24
-{
-  int LEDsCounterClockwise[14] = { 
-    2, 3, 4, 5, 6, 7, 8, 15, 14, 13, 12, 11, 10, 9      };
-  int index;
-  int count;
+void blinkArray(int ledArr[], int arrLength, int t){
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(ledArr[i], HIGH);
+  }
+  delay(t);
+  
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(ledArr[i], LOW);
+  }
+  delay(t);
+}
 
-  for (count = 1; count <= repeatCount; count++)
-  {
-    for (index = 0; index <= 13; index++)
-    {
-      digitalWrite(LEDsCounterClockwise[index], HIGH);
-      delay(ledOnTime);
-      digitalWrite(LEDsCounterClockwise[index], LOW);
-      delay(ledOffTime);
-    }
+void blinkArrayInOrder(int ledArr[], int arrLength, int t){
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(ledArr[i], HIGH);
+    delay(t);
+  }
+  
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(ledArr[i], LOW);
+    delay(t);
   }
 }
-
-// ************************************************BOARD+CONFIGURATION FOOTER BEGIN****************************************************
-//
-// Please do not modify the content of the footer, except for what comes between the triple hashtags (###...###). Thank you!
-// If you're curious, the #%! is to help parse the text for the board and configuration information.
-// In the following line of commented code, please ensure that the board type is correct (either "LED Board" or "KS Board").
-// If you would like additional digital or analog inputs in the exercise, please enter them with the following format:
-// (Keep in mind that the time is in units of milliseconds and the value can range from 0 to 1023.)
-// EXAMPLE 1: "board": {"type":"LED Board", "setup":{"pinKeyframes":[]}}
-// EXAMPLE 2: "board": {"type":"KS Board", "setup":{"pinKeyframes":[{"time":0,"pin":5,"value":0},{"time":2750,"pin":5,"value":260}]}}
-//
-// ACTUAL:#%!"board": {"type":"LED Board", "setup":{"pinKeyframes":[]}}#%!
-//
-// *************************************************BOARD+CONFIGURATION FOOTER END*****************************************************
-
