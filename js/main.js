@@ -80,6 +80,11 @@ editor.commands.addCommand({
   exec: runCode
 });
 
+// Ensure Ace recalculates its layout when the window or other UI elements change
+window.addEventListener('resize', function () { try { editor.resize(); } catch (e) {} });
+// Recalculate when bootstrap tabs are shown (some content height changes)
+$(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () { try { editor.resize(); } catch (e) {} });
+
 //launches change theme modal 
 function showThemes() {
   $("#theme-modal").modal('show');
@@ -97,6 +102,8 @@ function applyTheme() {
   })
   document.getElementById('editor').style.fontSize=`${fontSize}pt`;
   editor.session.setUseWrapMode(wrapping);
+
+  try { editor.resize(); } catch (e) {}
 
   setToStorage("themeValue", themeValue);
   setToStorage("font-size", fontSize);
@@ -228,6 +235,7 @@ function loadBoard(type, setup) {
     var w = window.getComputedStyle(document.getElementById("gif")).height;
     document.getElementById("console-output").style.height = w;
     document.getElementById("directions-content").style.height = w;
+    try { editor.resize(); } catch (e) {}
 
   } else {
     loadBoard(boardField.value, "");
@@ -306,27 +314,6 @@ function decodeWord(encodedWord, passphrase) {
       return String.fromCharCode(newCharCode);
   }).join('');
 }
-
-// Select the "Obtain Secret" button
-const obtainSecretButton = document.getElementById("obtain-secret");
-
-// Add a click event listener
-obtainSecretButton.addEventListener("click", function () {
-  // Check if the button has already been clicked
-  if (this.dataset.clicked === "true") {
-    // Refresh the page on subsequent clicks
-    location.reload();
-  } else {
-    // Mark the button as clicked
-    this.dataset.clicked = "true";
-
-    // Disable the button to prevent further clicks
-    this.disabled = true;
-
-    // Perform the "Obtain Secret" action here
-    console.log("Secret obtained!");
-  }
-});
 
 //Clipboard
 new Clipboard("#obtain-secret", {
@@ -558,6 +545,7 @@ function overwriteCode(includeComments = false) {
   }
 
   editor.setValue(code.trim());
+  try { editor.resize(); } catch (e) {}
 }
 
 
@@ -791,6 +779,7 @@ function loadExercise(promptForOverwrite) {
       setStatus("Exercise " + exerciseNum + " loaded! Press Run and Grade to test your code.", "success", false);
 
       setButtons("Run and Grade", true, false, false);
+      try { editor.resize(); } catch (e) {}
 
     } else {
       handleError();

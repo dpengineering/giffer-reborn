@@ -1,24 +1,28 @@
 void setup()
-{ 
-  //
-  // configure the LED pins as outputs
-  //
-  for (int ledNumber=2; ledNumber<=15; ledNumber++) // enable all the pins to be outputs
+{
+  for (int pin=2; pin<=15; pin++)
   {
-    pinMode(ledNumber, OUTPUT);
+    pinMode(pin, OUTPUT);
   }
 }
+
 void loop()
 {
-  int myFirstArray[14] = {
-    2,3,4,5,6,7,8,9,10,11,12,13,14,15  }; // creates an array of 14 integers / elements and initializes / assigns values to those integers  
-  int index;
-  // Blinks LED's in the order defined by the array
-  for(index = 0; index <= 13; index++)
-  { 
-    digitalWrite(myFirstArray[index], HIGH);  
-    delay(150);
-    digitalWrite(myFirstArray[index], LOW);
+  int arrLength = 7;
+  int left[arrLength] = {9, 10, 11, 12, 13, 14, 15};
+  int right[arrLength] = {2, 3, 4, 5, 6, 7, 8};
+  int t = 100;
+  
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(left[i], HIGH);
+    delay(t);
   }
-  delay(4000);
+  
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(right[i], HIGH);
+    delay(t);
+  }
+  
+  //TODO: Add 3 more for loops to complete the pattern
+  //Try not to create any new variables/arrays.
 }

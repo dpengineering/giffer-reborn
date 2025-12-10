@@ -1,24 +1,40 @@
 void setup()
-{ 
-  //
-  // configure the LED pins as outputs
-  //
-  for (int ledNumber=2; ledNumber<=15; ledNumber++) // enable all the pins to be outputs
+{
+  for (int pin=2; pin<=15; pin++)
   {
-    pinMode(ledNumber, OUTPUT);
+    pinMode(pin, OUTPUT);
   }
 }
+
 void loop()
 {
-  int myFirstArray[5] = {
-    2, 4, 6, 8, 14  }; // creates an array of 5 integers / elements and initializes / assigns values to those integers  
-  int index;
-  // Blinks LED's in the order defined by the array
-  for(index = 0; index <= 4; index++)
-  { 
-    digitalWrite(myFirstArray[index], HIGH);  
-    delay(150);
-    digitalWrite(myFirstArray[index], LOW);
+  int arrLength = 7;
+  int evens[arrLength] = {2, 4, 6, 8, 10, 12, 14};
+  //TODO: Define odds array here
+  int t = 200;
+  
+  turnOnArray(evens, arrLength);
+  //TODO: Call blinkArray function here with odds array
+}
+
+void turnOnArray(int ledArr[], int arrLength){
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(ledArr[i], HIGH);
   }
-  delay(4000);
+}
+
+void turnOffArray(int ledArr[], int arrLength){
+  //TODO: Implement this function to turn off all LEDs in ledArr
+}
+
+void blinkArray(int ledArr[], int arrLength, int t){
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(ledArr[i], HIGH);
+  }
+  delay(t);
+  
+  for (int i=0; i < arrLength; i++){
+    digitalWrite(ledArr[i], LOW);
+  }
+  delay(t);
 }
