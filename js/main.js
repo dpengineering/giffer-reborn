@@ -341,14 +341,13 @@ new Clipboard("#obtain-secret", {
 
     // Access the name input value
     var nameInput = document.getElementById("name").value;
-    var exerciseNum = currentExercise.number;//document.getElementById("exercise-number").value;
+    var exerciseNum = currentExercise.number;
     var hashedVal = toHash(nameInput);
     var selectedPhrase = phrases[Math.abs(hashedVal % phrases.length)];
     var startingEx = 30;
 
     if (exerciseNum >= startingEx){
       var encoded = encodeWord(selectedPhrase.toUpperCase(), nameInput.toUpperCase());
-      console.log(encoded);
       secret = encoded[exerciseNum - startingEx];
       console.log(secret);
     }
