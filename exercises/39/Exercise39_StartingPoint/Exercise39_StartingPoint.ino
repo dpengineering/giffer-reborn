@@ -1,20 +1,15 @@
 void setup()
-{
-  int pinNumber;
+{ 
 
-  for (pinNumber = 2; pinNumber <= 15; pinNumber++)
-  {
-    pinMode(pinNumber, OUTPUT);
-  }
 }
 
-void loop ()
+void loop()
 {
-  yourCustomFunction();
-  delay(3000);
+
 }
 
-void yourCustomFunction()
-{
-  delay(100);
+void blinkPairs(int led1, int led2, int t, int repeatCount)
+{ 
+
 }
+
