@@ -1,85 +1,86 @@
-//**************ACTIVITES TO CHECK WHILE GRADING**********BEGIN*********
-//
-// 1.	Verify that LEDs blink in this order 15, 8, 7, 14, 13, 6, 5, 12, 11, 4, 3, 10, 9, 2
-// 2.	Should pause for 4 seconds with all LEDS OFF and then repeat the sequence again
-// 3.	Verify that only one for loop is used in loop()
-// 4.	Verify that delay(waitTime) is used
-// 5.	Verify that delay(waitTime*something) is used
-//
-// ***************ACTIVITIES TO CHECK WHILE GRADING END*********************
-
 void setup()
 {
-  int ledNumber;
-  for(ledNumber=2; ledNumber<=15; ledNumber++)
+  for(int pin = 2; pin <= 15;pin++)
   {
-    pinMode(ledNumber,OUTPUT); // Enable pins connected to LEDs 2-15 to be outputs
+    pinMode(pin,OUTPUT);
   }
 }
 
 void loop()
 {
-  int count;
-  int waitTime=100;
-  for(count =1; count<=15; count ++)  // This will repeat 15 times
+  int t = 100;
+  for(int count = 1; count<=15;count++) 
   {
-    digitalWrite(15, HIGH);   // This turns on the LEDs in a downward snakinng pattern
-    delay(waitTime);
+    digitalWrite(15, HIGH);  
+    delay(t);
     digitalWrite(15, LOW);
+    delay(t);
+    
     digitalWrite(8, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(8, LOW);
+    delay(t);
+    
     digitalWrite(7, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(7, LOW);
+    delay(t);
+    
     digitalWrite(14, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(14, LOW);
+    delay(t);
+    
     digitalWrite(13, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(13, LOW);
+    delay(t);
+    
     digitalWrite(6, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(6, LOW);
+    delay(t);
+    
     digitalWrite(5, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(5, LOW);
+    delay(t);
+    
     digitalWrite(12, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(12, LOW);
+    delay(t);
+    
     digitalWrite(11, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(11, LOW);
+    delay(t);
+    
     digitalWrite(4, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(4, LOW);
+    delay(t);
+    
     digitalWrite(3, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(3, LOW);
+    delay(t);
+    
     digitalWrite(10, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(10, LOW);
+    delay(t);
+    
     digitalWrite(9, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(9, LOW);
+    delay(t);
+    
     digitalWrite(2, HIGH);
-    delay(waitTime);
+    delay(t);
     digitalWrite(2, LOW);
+    delay(t);
+    
   }
-  delay(waitTime*40);  // Wait 4 seconds with all LED's off before repeating loop()
+  delay(4000);
 }
-
-// ************************************************BOARD+CONFIGURATION FOOTER BEGIN****************************************************
-//
-// Please do not modify the content of the footer, except for what comes between the triple hashtags (###...###). Thank you!
-// If you're curious, the #%! is to help parse the text for the board and configuration information.
-// In the following line of commented code, please ensure that the board type is correct (either "LED Board" or "KS Board").
-// If you would like additional digital or analog inputs in the exercise, please enter them with the following format:
-// (Keep in mind that the time is in units of milliseconds and the value can range from 0 to 1023.)
-// EXAMPLE 1: "board": {"type":"LED Board", "setup":{"pinKeyframes":[]}}
-// EXAMPLE 2: "board": {"type":"KS Board", "setup":{"pinKeyframes":[{"time":0,"pin":5,"value":0},{"time":2750,"pin":5,"value":260}]}}
-//
-// ACTUAL:#%!"board": {"type":"LED Board", "setup":{"pinKeyframes":[]}}#%!
-//
-// *************************************************BOARD+CONFIGURATION FOOTER END*****************************************************
-
