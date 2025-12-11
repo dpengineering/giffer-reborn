@@ -8,7 +8,7 @@ void loop()
 
 }
 
-void sidesUp()
+void sidesUp(int onTime, int offTime, int repeatCount)
 { 
 
 }

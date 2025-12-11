@@ -80,6 +80,13 @@ editor.commands.addCommand({
   exec: runCode
 });
 
+// Format command (auto-format similar to Arduino IDE)
+editor.commands.addCommand({
+  name: "format",
+  bindKey: { win: "Ctrl-Shift-F", mac: "Command-Shift-F" },
+  exec: function () { try { formatCode(); } catch (e) { console.error(e); } }
+});
+
 // Ensure Ace recalculates its layout when the window or other UI elements change
 window.addEventListener('resize', function () { try { editor.resize(); } catch (e) {} });
 // Recalculate when bootstrap tabs are shown (some content height changes)
@@ -546,6 +553,70 @@ function overwriteCode(includeComments = false) {
 
   editor.setValue(code.trim());
   try { editor.resize(); } catch (e) {}
+}
+
+// Basic C/C++ formatter: adjusts indentation for braces and preserves comments/preprocessor lines.
+function formatCode() {
+  var code = editor.getValue();
+  var lines = code.split(/\r?\n/);
+  var indentLevel = 0;
+  var indentStr = '  '; // two spaces
+  var inBlockComment = false;
+  var out = [];
+
+  for (var i = 0; i < lines.length; i++) {
+    var raw = lines[i];
+    var trimmed = raw.trim();
+
+    if (trimmed.length === 0) {
+      out.push('');
+      continue;
+    }
+
+    // Preserve preprocessor directives at column 0
+    if (trimmed.startsWith('#')) {
+      out.push(trimmed);
+      continue;
+    }
+
+    // Handle block comments
+    if (inBlockComment) {
+      out.push(indentStr.repeat(indentLevel) + trimmed);
+      if (trimmed.includes('*/')) inBlockComment = false;
+      continue;
+    }
+    if (trimmed.startsWith('/*')) {
+      out.push(indentStr.repeat(indentLevel) + trimmed);
+      if (!trimmed.includes('*/')) inBlockComment = true;
+      continue;
+    }
+
+    // If line starts with a closing brace, dedent first
+    if (/^}/.test(trimmed)) {
+      indentLevel = Math.max(0, indentLevel - 1);
+    }
+
+    var currentIndent = indentStr.repeat(indentLevel);
+    out.push(currentIndent + trimmed);
+
+    // Update indent level by counting braces on the line
+    var opens = (trimmed.match(/{/g) || []).length;
+    var closes = (trimmed.match(/}/g) || []).length;
+    indentLevel += opens - closes;
+    if (indentLevel < 0) indentLevel = 0;
+  }
+
+  var formatted = out.join('\n');
+
+  // Preserve cursor position as best-effort
+  var cursor = editor.getCursorPosition();
+  editor.session.setValue(formatted);
+  try { editor.resize(); } catch (e) {}
+  var row = Math.min(cursor.row, editor.session.getLength() - 1);
+  var column = Math.min(cursor.column, editor.session.getLine(row).length);
+  editor.moveCursorTo(row, column);
+  editor.clearSelection();
+  editor.focus();
 }
 
 
