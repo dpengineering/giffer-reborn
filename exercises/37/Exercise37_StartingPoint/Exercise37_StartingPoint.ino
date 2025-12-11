@@ -8,7 +8,7 @@ void loop()
 
 }
 
-void zigzag()
+void zigzag(int t, int repeatCount)
 { 
 
 }
