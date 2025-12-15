@@ -322,6 +322,44 @@ function decodeWord(encodedWord, passphrase) {
   }).join('');
 }
 
+// Add event listener to the "Decode Word" button
+document.getElementById("decode-word-button").addEventListener("click", function () {
+  // Get the current name input value
+  const nameInput = document.getElementById("name").value.toUpperCase();
+
+  // Get the passphrase entered by the user
+  const passphrase = document.getElementById("passphrase").value;
+
+  // Ensure the name input is exactly 20 characters long
+  if (passphrase.length !== 20) {
+    alert("The name input must be exactly 20 characters long.");
+    return;
+  }
+
+  // Ensure the passphrase is not empty
+  if (!passphrase) {
+    alert("Please enter a passphrase.");
+    return;
+  }
+
+  // Call the decodeWord function
+  try {
+    const decodedWord = decodeWord(passphrase, nameInput);
+
+    // Check if the decoded phrase is in the list of phrases
+    if (phrases.includes(decodedWord)) {
+      // Display the decoded phrase to the user
+      alert("Decoded Phrase: " + decodedWord);
+    } else {
+      // Inform the user that the decoded phrase is not valid
+      alert("Invalid Phrase.");
+    }
+  } catch (error) {
+    console.error("Error decoding phrase:", error);
+    alert("Failed to decode the phrase. Please check your input.");
+  }
+});
+
 //Clipboard
 new Clipboard("#obtain-secret", {
   text: function () {
