@@ -322,19 +322,14 @@ function decodeWord(encodedWord, passphrase) {
   }).join('');
 }
 
+var selectedPhrase = "NULLNULLNULLNULLNULL";
+var startingEx = 30;
+
 // Add event listener to the "Decode Word" button
 document.getElementById("decode-word-button").addEventListener("click", function () {
   // Get the current name input value
   const nameInput = document.getElementById("name").value.toUpperCase();
-
-  // Get the passphrase entered by the user
   const passphrase = document.getElementById("passphrase").value;
-
-  // Ensure the name input is exactly 20 characters long
-  if (passphrase.length !== 20) {
-    alert("The name input must be exactly 20 characters long.");
-    return;
-  }
 
   // Ensure the passphrase is not empty
   if (!passphrase) {
@@ -342,21 +337,55 @@ document.getElementById("decode-word-button").addEventListener("click", function
     return;
   }
 
+  const passphraseCleaned = passphrase.replace(/\s/g, '').toUpperCase();
+  if (passphraseCleaned.length !== 20) {
+    alert("The name input must be exactly 20 characters long.");
+    return;
+  }
+
   // Call the decodeWord function
   try {
-    const decodedWord = decodeWord(passphrase, nameInput);
+    const decodedWord = decodeWord(passphraseCleaned, nameInput);
 
-    // Check if the decoded phrase is in the list of phrases
-    if (phrases.includes(decodedWord)) {
-      // Display the decoded phrase to the user
-      alert("Decoded Phrase: " + decodedWord);
+    if (selectedPhrase === "NULLNULLNULLNULLNULL") {
+      alert("Please run an exercise first to obtain the secret phrase.");
+      return;
+    }
+
+    // Ensure both strings are the same length
+    if (decodedWord.length !== selectedPhrase.length) {
+      alert("The decoded word and the selected phrase must be the same length.");
+      return;
+    }
+
+    // Find the indices where the letters differ
+    const differingIndices = [];
+    for (let i = 0; i < decodedWord.length; i++) {
+      if (decodedWord[i] !== selectedPhrase[i]) {
+        differingIndices.push(i + startingEx);
+      }
+    }
+
+    // Display the differing indices
+    if (differingIndices.length === 0) {
+      document.getElementById("passphrase").value = decodedWord;
+      alert("Woohoo! Your decoded secret phrase is:\n" + decodedWord);
+
+      const celebration = document.getElementById("celebration-animation");
+
+      // Trigger the celebration animation
+      celebration.style.display = "block";
+
+      // Hide the element after the animation ends
+      celebration.addEventListener("animationend", () => {
+        celebration.style.display = "none";
+      });
     } else {
-      // Inform the user that the decoded phrase is not valid
-      alert("Invalid Phrase.");
+      alert("Please revisit exercise(s): " + differingIndices.join(", "));
     }
   } catch (error) {
-    console.error("Error decoding phrase:", error);
-    alert("Failed to decode the phrase. Please check your input.");
+    console.error("Error decoding word:", error);
+    alert("Failed to decode the word. Please check your input.");
   }
 });
 
@@ -375,8 +404,7 @@ new Clipboard("#obtain-secret", {
     var nameInput = document.getElementById("name").value;
     var exerciseNum = currentExercise.number;
     var hashedVal = toHash(nameInput);
-    var selectedPhrase = phrases[Math.abs(hashedVal % phrases.length)];
-    var startingEx = 30;
+    selectedPhrase = phrases[Math.abs(hashedVal % phrases.length)];
 
     if (exerciseNum >= startingEx){
       var encoded = encodeWord(selectedPhrase.toUpperCase(), nameInput.toUpperCase());
