@@ -131,3 +131,30 @@ div.form-group label {
 
 /* Checkbox size! */
 .big-checkbox {width: 25px; height: 25px;}
+
+@keyframes fadeInAndBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+  80% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0; /* Fade out */
+    transform: scale(1);
+  }
+}
+
+#celebration-animation {
+  font-size: 2rem;
+  color: #4caf50;
+  text-align: center;
+  margin-top: 20px;
+  animation: fadeInAndBounce 2s ease-in-out; /* Extend duration to 2s for fade-out */
+}
