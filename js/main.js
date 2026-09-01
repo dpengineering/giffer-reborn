@@ -137,6 +137,7 @@ exerciseField.onkeyup = function (e) {
 var runButton = document.getElementById("run-button");
 var copyPage = document.getElementById("obtain-secret");
 var finishDebug = document.getElementById("finish-debug");
+var downloadGifButton = document.getElementById("download-gif-button");
 
 //Canvas
 var canvas = document.getElementById("canvas");
@@ -444,6 +445,13 @@ function showCanvas(dontShow) {
 
   document.getElementById("canvas-speed").disabled = false;
 
+  // Only the student's own output can be downloaded -- never the instructor's
+  // correct gif, which is rendered separately onto #correct-canvas. Gif capture
+  // only supports the 2d boards, so hide the button for WebGL boards.
+  var canDownload = currentBoard && !currentBoard.hasCustomCanvas && currentBoard.canvasType === "2d";
+  downloadGifButton.style.display = canDownload ? "block" : "none";
+  downloadGifButton.disabled = false;
+
   if (!dontShow) {
     $("#output-tabs a[href=\"#gif\"]").tab("show");
   }
@@ -457,6 +465,7 @@ function hideCanvas() {
   gifOutput.classList.add("blur");
 
   document.getElementById("canvas-speed").disabled = true;
+  downloadGifButton.style.display = "none";
 }
 
 //Output
@@ -1053,6 +1062,88 @@ function generateConfirmationGif(isCorrect) {
     img.src = "data:image/gif;base64," + btoa(binString); //+ btoa(String.fromCharCode.apply(null, e));
     img.id = "confirmation-gif";
     container.appendChild(img);
+  });
+
+  gif.render();
+}
+
+//Download the student's own output as an animated gif.
+//This always encodes lastContent.frameManager (the code the student just ran).
+//The instructor's "correct" gif lives on correctBoard/#correct-canvas and is
+//never passed here, so it can't be downloaded.
+function downloadOutputGif() {
+  var frameManager = lastContent.frameManager;
+  if (!frameManager) {
+    setStatus("Run your code first to generate a gif.", "danger", false);
+    return;
+  }
+
+  // Rebuild a standalone board of the same type/config so we don't disturb the
+  // live animation running on currentBoard.
+  var board = createBoard(currentBoard.type, currentBoard.getSetup());
+
+  if (board.hasCustomCanvas || board.canvasType !== "2d") {
+    setStatus("Gif download isn't supported for this board type.", "danger", false);
+    return;
+  }
+
+  if (!frameManager.frames || frameManager.frames.length === 0) {
+    // gif.js never emits "finished" with zero frames, which would leave the
+    // button disabled and the status stuck. Bail out cleanly instead.
+    setStatus("Nothing to download yet.", "danger", false);
+    return;
+  }
+
+  downloadGifButton.disabled = true;
+  setStatus("Preparing gif download . . .", "info", true);
+
+  var width = board.canvasWidth;
+  var height = board.canvasHeight;
+
+  var captureCanvas = document.createElement("canvas");
+  captureCanvas.width = width;
+  captureCanvas.height = height;
+  var ctx = captureCanvas.getContext("2d");
+
+  var date = new Date();
+  board.initFrameManager(frameManager);
+  board.setContext({
+    dateString: date.toDateString(),
+    timeString: date.toLocaleTimeString(),
+    isCorrect: frameManager.grade,
+    exerciseNumber: exerciseField.value,
+    name: nameField.value
+  });
+
+  var gif = new GIF({ workers: 4, quality: 10, workerScript: "js/gif/gif.worker.js", width: width, height: height });
+
+  for (var i = 0; i < frameManager.frames.length; i++) {
+    board.gotoFrame(i);
+    board.draw(ctx, 0);
+
+    // board.draw() clears to transparent; on the live DOM canvas that reads as
+    // the page's white background, but an encoded gif would show it as black.
+    // Paint white *behind* the drawing so the gif matches what students see.
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, width, height);
+    ctx.globalCompositeOperation = "source-over";
+
+    // postDelay is in ms; clamp instantaneous keyframes so every frame is visible.
+    var delay = board.currentFrame.postDelay;
+    gif.addFrame(ctx, { copy: true, delay: (delay > 0) ? delay : 20 });
+  }
+
+  gif.on("finished", function (blob) {
+    var safe = function (s) { return String(s).trim().replace(/[^a-z0-9_-]+/gi, "_"); };
+    var safeName = safe(nameField.value || "output") || "output";
+    var safeExercise = safe(exerciseField.value);
+    var prefix = safeExercise ? "Exercise_" + safeExercise + "_" : "";
+    saveAs(blob, prefix + safeName + ".gif");
+
+    downloadGifButton.disabled = false;
+    setStatus("Gif", "");
   });
 
   gif.render();
