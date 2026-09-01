@@ -1129,7 +1129,8 @@ function downloadOutputGif() {
     name: nameField.value
   });
 
-  var frameDelay = function (i) {
+  var frameDelay = function () {
+    // Delay for the current frame (set via gotoFrame just before each call).
     // postDelay is in ms; clamp instantaneous keyframes so every frame is visible.
     var delay = board.currentFrame.postDelay;
     return (delay > 0) ? delay : 20;
@@ -1156,7 +1157,7 @@ function downloadOutputGif() {
       ctx.fillRect(0, 0, width, height);
       ctx.globalCompositeOperation = "source-over";
 
-      gif.addFrame(ctx, { copy: true, delay: frameDelay(i) });
+      gif.addFrame(ctx, { copy: true, delay: frameDelay() });
     }
   } else {
     // Light Sculpture is a WebGL/three.js board. Match the angle the student is
@@ -1175,11 +1176,15 @@ function downloadOutputGif() {
       board.draw(null, 0);
       board.renderer.render(board.scene, board.camera);
       // copy:true reads the pixels now, so the buffer is safe to reuse next loop.
-      gif.addFrame(board.renderer.domElement, { copy: true, delay: frameDelay(j) });
+      gif.addFrame(board.renderer.domElement, { copy: true, delay: frameDelay() });
     }
 
-    // Free the throwaway WebGL context so repeated downloads don't exhaust them.
+    // Free the throwaway WebGL context and its controls so repeated downloads
+    // don't exhaust WebGL contexts or leak listeners.
     try {
+      if (board.controls && board.controls.dispose) {
+        board.controls.dispose();
+      }
       board.renderer.forceContextLoss();
       board.renderer.dispose();
     } catch (e) { /* older three.js may lack these; the context is GC'd anyway */ }
