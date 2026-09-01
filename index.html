@@ -153,6 +153,13 @@
                       <hr>
                       <canvas id="canvas" width="100" height="100"></canvas>
                       <br>
+                      <div id="download-gif-controls" style="display: none;">
+                        <button class="btn btn-outline-primary" id="download-gif-button" type="button" onclick="downloadOutputGif()">Download Gif</button>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="animation-only-checkbox">
+                          <label class="form-check-label" for="animation-only-checkbox">Animation only (no info panel)</label>
+                        </div>
+                      </div>
                       <div id="correct-section" style="display: none;">
                         <hr>
                         <h4>Correct Gif: </h4>
@@ -160,8 +167,6 @@
                         <br>
                       </div>
                       <span id="playback-speed">Playback Speed: 1</span><input class="custom-range" type="range" id="canvas-speed" value="1" min="0" max="3" step="0.01">
-                      <br>
-                      <button class="btn btn-outline-primary" id="download-gif-button" type="button" style="display: none;" onclick="downloadOutputGif()">Download Gif</button>
                     </div>
                   </div>
                   <div class="tab-pane fade" id="output" role="tabpanel" aria-labelledby="output-tab">

@@ -138,6 +138,7 @@ var runButton = document.getElementById("run-button");
 var copyPage = document.getElementById("obtain-secret");
 var finishDebug = document.getElementById("finish-debug");
 var downloadGifButton = document.getElementById("download-gif-button");
+var downloadGifControls = document.getElementById("download-gif-controls");
 
 //Canvas
 var canvas = document.getElementById("canvas");
@@ -447,9 +448,9 @@ function showCanvas(dontShow) {
 
   // Only the student's own output can be downloaded -- never the instructor's
   // correct gif, which is rendered separately onto #correct-canvas. Gif capture
-  // only supports the 2d boards, so hide the button for WebGL boards.
+  // only supports the 2d boards, so hide the controls for WebGL boards.
   var canDownload = currentBoard && !currentBoard.hasCustomCanvas && currentBoard.canvasType === "2d";
-  downloadGifButton.style.display = canDownload ? "block" : "none";
+  downloadGifControls.style.display = canDownload ? "block" : "none";
   downloadGifButton.disabled = false;
 
   if (!dontShow) {
@@ -465,7 +466,7 @@ function hideCanvas() {
   gifOutput.classList.add("blur");
 
   document.getElementById("canvas-speed").disabled = true;
-  downloadGifButton.style.display = "none";
+  downloadGifControls.style.display = "none";
 }
 
 //Output
@@ -1097,8 +1098,19 @@ function downloadOutputGif() {
   downloadGifButton.disabled = true;
   setStatus("Preparing gif download . . .", "info", true);
 
-  var width = board.canvasWidth;
   var height = board.canvasHeight;
+  var width = board.canvasWidth;
+
+  // "Animation only" drops the info panel (drawn by drawInfo to the right of the
+  // shield) and crops the gif to just the shield/animation region.
+  var animationOnly = document.getElementById("animation-only-checkbox").checked;
+  if (animationOnly) {
+    board.drawInfo = function () {};
+    var animWidth = board.imageWidth || (board.shieldImg && board.shieldImg.width);
+    if (animWidth) {
+      width = Math.min(animWidth, board.canvasWidth);
+    }
+  }
 
   var captureCanvas = document.createElement("canvas");
   captureCanvas.width = width;
@@ -1140,7 +1152,8 @@ function downloadOutputGif() {
     var safeName = safe(nameField.value || "output") || "output";
     var safeExercise = safe(exerciseField.value);
     var prefix = safeExercise ? "Exercise_" + safeExercise + "_" : "";
-    saveAs(blob, prefix + safeName + ".gif");
+    var suffix = animationOnly ? "_animation" : "";
+    saveAs(blob, prefix + safeName + suffix + ".gif");
 
     downloadGifButton.disabled = false;
     setStatus("Gif", "");
