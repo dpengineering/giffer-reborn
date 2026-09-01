@@ -139,6 +139,7 @@ var copyPage = document.getElementById("obtain-secret");
 var finishDebug = document.getElementById("finish-debug");
 var downloadGifButton = document.getElementById("download-gif-button");
 var downloadGifControls = document.getElementById("download-gif-controls");
+var animationOnlyWrapper = document.getElementById("animation-only-wrapper");
 
 //Canvas
 var canvas = document.getElementById("canvas");
@@ -447,10 +448,14 @@ function showCanvas(dontShow) {
   document.getElementById("canvas-speed").disabled = false;
 
   // Only the student's own output can be downloaded -- never the instructor's
-  // correct gif, which is rendered separately onto #correct-canvas. Gif capture
-  // only supports the 2d boards, so hide the controls for WebGL boards.
-  var canDownload = currentBoard && !currentBoard.hasCustomCanvas && currentBoard.canvasType === "2d";
+  // correct gif, which is rendered separately onto #correct-canvas.
+  var is2dBoard = currentBoard && currentBoard.canvasType === "2d";
+  var isSculptureBoard = currentBoard && currentBoard.type === "Light Sculpture";
+  var canDownload = is2dBoard || isSculptureBoard;
   downloadGifControls.style.display = canDownload ? "block" : "none";
+  // The "animation only" (drop info panel) option only applies to the 2d boards;
+  // the Light Sculpture render has no info panel to drop.
+  animationOnlyWrapper.style.display = is2dBoard ? "block" : "none";
   downloadGifButton.disabled = false;
 
   if (!dontShow) {
@@ -1083,7 +1088,9 @@ function downloadOutputGif() {
   // live animation running on currentBoard.
   var board = createBoard(currentBoard.type, currentBoard.getSetup());
 
-  if (board.hasCustomCanvas || board.canvasType !== "2d") {
+  var is2d = board.canvasType === "2d";
+  var isSculpture = board.type === "Light Sculpture" && !!board.renderer;
+  if (!is2d && !isSculpture) {
     setStatus("Gif download isn't supported for this board type.", "danger", false);
     return;
   }
@@ -1101,9 +1108,9 @@ function downloadOutputGif() {
   var height = board.canvasHeight;
   var width = board.canvasWidth;
 
-  // "Animation only" drops the info panel (drawn by drawInfo to the right of the
-  // shield) and crops the gif to just the shield/animation region.
-  var animationOnly = document.getElementById("animation-only-checkbox").checked;
+  // "Animation only" (2d boards only) drops the info panel drawn by drawInfo to
+  // the right of the shield and crops the gif to just the animation region.
+  var animationOnly = is2d && document.getElementById("animation-only-checkbox").checked;
   if (animationOnly) {
     board.drawInfo = function () {};
     var animWidth = board.imageWidth || (board.shieldImg && board.shieldImg.width);
@@ -1111,11 +1118,6 @@ function downloadOutputGif() {
       width = Math.min(animWidth, board.canvasWidth);
     }
   }
-
-  var captureCanvas = document.createElement("canvas");
-  captureCanvas.width = width;
-  captureCanvas.height = height;
-  var ctx = captureCanvas.getContext("2d");
 
   var date = new Date();
   board.initFrameManager(frameManager);
@@ -1127,24 +1129,65 @@ function downloadOutputGif() {
     name: nameField.value
   });
 
-  var gif = new GIF({ workers: 4, quality: 10, workerScript: "js/gif/gif.worker.js", width: width, height: height });
-
-  for (var i = 0; i < frameManager.frames.length; i++) {
-    board.gotoFrame(i);
-    board.draw(ctx, 0);
-
-    // board.draw() clears to transparent; on the live DOM canvas that reads as
-    // the page's white background, but an encoded gif would show it as black.
-    // Paint white *behind* the drawing so the gif matches what students see.
-    ctx.globalCompositeOperation = "destination-over";
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, width, height);
-    ctx.globalCompositeOperation = "source-over";
-
+  var frameDelay = function () {
+    // Delay for the current frame (set via gotoFrame just before each call).
     // postDelay is in ms; clamp instantaneous keyframes so every frame is visible.
     var delay = board.currentFrame.postDelay;
-    gif.addFrame(ctx, { copy: true, delay: (delay > 0) ? delay : 20 });
+    return (delay > 0) ? delay : 20;
+  };
+
+  var gif = new GIF({ workers: 4, quality: 10, workerScript: "js/gif/gif.worker.js", width: width, height: height });
+
+  if (is2d) {
+    var captureCanvas = document.createElement("canvas");
+    captureCanvas.width = width;
+    captureCanvas.height = height;
+    var ctx = captureCanvas.getContext("2d");
+
+    for (var i = 0; i < frameManager.frames.length; i++) {
+      board.gotoFrame(i);
+      board.draw(ctx, 0);
+
+      // board.draw() clears to transparent; on the live DOM canvas that reads as
+      // the page's white background, but an encoded gif would show it as black.
+      // Paint white *behind* the drawing so the gif matches what students see.
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, width, height);
+      ctx.globalCompositeOperation = "source-over";
+
+      gif.addFrame(ctx, { copy: true, delay: frameDelay() });
+    }
+  } else {
+    // Light Sculpture is a WebGL/three.js board. Match the angle the student is
+    // currently viewing by copying the live camera, then render each keyframe and
+    // read the drawing buffer back synchronously (before the browser clears it).
+    if (currentBoard.camera && board.camera) {
+      board.camera.position.copy(currentBoard.camera.position);
+      board.camera.quaternion.copy(currentBoard.camera.quaternion);
+      board.camera.up.copy(currentBoard.camera.up);
+      board.camera.zoom = currentBoard.camera.zoom;
+      board.camera.updateProjectionMatrix();
+    }
+
+    for (var j = 0; j < frameManager.frames.length; j++) {
+      board.gotoFrame(j);
+      board.draw(null, 0);
+      board.renderer.render(board.scene, board.camera);
+      // copy:true reads the pixels now, so the buffer is safe to reuse next loop.
+      gif.addFrame(board.renderer.domElement, { copy: true, delay: frameDelay() });
+    }
+
+    // Free the throwaway WebGL context and its controls so repeated downloads
+    // don't exhaust WebGL contexts or leak listeners.
+    try {
+      if (board.controls && board.controls.dispose) {
+        board.controls.dispose();
+      }
+      board.renderer.forceContextLoss();
+      board.renderer.dispose();
+    } catch (e) { /* older three.js may lack these; the context is GC'd anyway */ }
   }
 
   gif.on("finished", function (blob) {
