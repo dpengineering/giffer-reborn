@@ -452,10 +452,12 @@ function showCanvas(dontShow) {
   var is2dBoard = currentBoard && currentBoard.canvasType === "2d";
   var isSculptureBoard = currentBoard && currentBoard.type === "Light Sculpture";
   var canDownload = is2dBoard || isSculptureBoard;
-  downloadGifControls.style.display = canDownload ? "block" : "none";
+  // flex (not block) so the button and checkbox sit next to each other.
+  downloadGifControls.style.display = canDownload ? "flex" : "none";
   // The "animation only" (drop info panel) option only applies to the 2d boards;
-  // the Light Sculpture render has no info panel to drop.
-  animationOnlyWrapper.style.display = is2dBoard ? "block" : "none";
+  // the Light Sculpture render has no info panel to drop. Empty string restores
+  // the checkbox's class-defined inline display rather than forcing block.
+  animationOnlyWrapper.style.display = is2dBoard ? "" : "none";
   downloadGifButton.disabled = false;
 
   if (!dontShow) {
