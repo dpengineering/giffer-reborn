@@ -115,6 +115,7 @@
                     <hr>
                     <button class="btn btn-info" onclick="showReadme()">Show Help</button>
                     <button class="btn btn-secondary" onclick="showThemes()">Change Theme</button>
+                    <button class="btn btn-secondary" onclick="showRandomChunk()">Random Chunk</button>
                     <hr>
      
                     <div class="form-group">
@@ -329,6 +330,27 @@
   </div>
 </div>
 
+<div class="modal fade" id="random-chunk-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-title">Random Chunk <small class="text-muted" id="random-chunk-id"></small></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted" id="random-chunk-note"></p>
+        <pre class="mb-0" style="overflow: auto; max-height: 60vh;"><code class="cpp" id="random-chunk-code"></code></pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="showRandomChunk()">Another</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="gen-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -482,6 +504,7 @@ int main() {
 <script src="js/FileSaver.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/clipboard.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/highlight.pack.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/quizChunks.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/Debugger.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/three.min.js" type="text/javascript" charset="utf-8"></script>
 <script src="js/OrbitControls.js" type="text/javascript" charset="utf-8"></script>
