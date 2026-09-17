@@ -97,6 +97,36 @@ function showThemes() {
   $("#theme-modal").modal('show');
 }
 
+// Pops up a random code snippet (from js/quizChunks.js) for class discussion.
+// Read-only -- there is no way to run it, it's just shown for a mini quiz.
+var lastChunkIndex = -1;
+function showRandomChunk() {
+  if (typeof QUIZ_CHUNKS === "undefined" || QUIZ_CHUNKS.length === 0) {
+    return;
+  }
+
+  // Pick a random chunk, avoiding an immediate repeat when there's a choice.
+  var index = Math.floor(Math.random() * QUIZ_CHUNKS.length);
+  while (QUIZ_CHUNKS.length > 1 && index === lastChunkIndex) {
+    index = Math.floor(Math.random() * QUIZ_CHUNKS.length);
+  }
+  lastChunkIndex = index;
+  var chunk = QUIZ_CHUNKS[index];
+
+  var codeEl = document.getElementById("random-chunk-code");
+  codeEl.className = "cpp";           // reset language class before (re)highlighting
+  codeEl.textContent = chunk.code;    // textContent avoids any HTML injection from the snippet
+  if (typeof hljs !== "undefined") {
+    hljs.highlightBlock(codeEl);
+  }
+
+  document.getElementById("random-chunk-id").textContent = chunk.id || "";
+  document.getElementById("random-chunk-note").textContent =
+    (typeof QUIZ_CHUNK_NOTE !== "undefined") ? QUIZ_CHUNK_NOTE : "";
+
+  $("#random-chunk-modal").modal('show');
+}
+
 // applies the settings selected in the above modal
 function applyTheme() {
   var themeSelector = document.getElementById('themes');
