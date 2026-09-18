@@ -18,7 +18,7 @@ var QUIZ_CHUNKS = [
 `int led = 2;
 while (led <=8){
   digitalWrite(led, HIGH);
-  led++;
+  led+=2;
 }`
   },
   {
@@ -40,7 +40,32 @@ while (led <= 15){
   digitalWrite(led - 7, HIGH);
   delay(250);
   digitalWrite(led, LOW);
-  led--;
+  led++;
+}`
+  },
+  {
+    id: "Q4",
+    code:
+`int x = 1;
+while (x <= 67){
+  digitalWrite(6, HIGH);
+  digitalWrite(7, HIGH);
+  delay(250);
+  digitalWrite(6, LOW);
+  digitalWrite(7, LOW);
+  x++;
+}`
+  },
+  {
+    id: "Q5",
+    code:
+`int led = 1;
+while (led <= 15){
+  digitalWrite(2, HIGH);
+  delay(250);
+  digitalWrite(2, LOW);
+  led++;
 }`
   }
+  
 ];
