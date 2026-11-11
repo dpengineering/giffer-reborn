@@ -158,3 +158,9 @@ div.form-group label {
   margin-top: 20px;
   animation: fadeInAndBounce 2s ease-in-out; /* Extend duration to 2s for fade-out */
 }
+/* Error underline added by showFriendlyError() in main.js */
+.error-highlight {
+    position: absolute;
+    background: rgba(255, 60, 60, 0.25);
+    border-bottom: 2px wavy #e53935;
+}

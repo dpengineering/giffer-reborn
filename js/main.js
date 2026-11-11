@@ -1,3 +1,9 @@
+// Cache-busting version (e.g. "?v=2026.11.10-1530") taken from this script's own URL in
+// index.html, where deploy/bump-version.sh sets it. Passed on to the interpreter worker.
+var ASSET_VERSION = (function () {
+  try { return new URL(document.currentScript.src).search; } catch (e) { return ""; }
+})();
+
 "use strict";
 
 //Storage
@@ -94,6 +100,10 @@ $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () { try { edito
 
 //launches change theme modal 
 function showThemes() {
+  // Reflect the current settings in the modal instead of always showing the defaults.
+  document.getElementById('themes').value = themeValue;
+  document.getElementById('font-size').value = fontSize;
+  document.getElementById('wrapping-check').checked = wrapping;
   $("#theme-modal").modal('show');
 }
 
@@ -565,10 +575,10 @@ function runCode(callback) {
   // Set the content of the output console to nada.
   document.getElementById("console-output").innerHTML = "";
 
-  editor.getSession().setAnnotations([]);
+  clearErrorHighlight();
 
   // Creates a dedicated web worker that executes the script. Essentially creates a new thread.
-  jscpp = new Worker("js/JSCPP-WebWorker.js");
+  jscpp = new Worker("js/JSCPP-WebWorker.js" + ASSET_VERSION);
 
   var shouldGrade = currentExercise.number !== null;
 
@@ -615,33 +625,7 @@ function runCode(callback) {
   var code = currentPrefix + editor.getValue() + suffix;
 
   jscpp.onerror = function (e) {
-    var errorObj = e.message;
-    var matches = /([0-9]+):([0-9]+)/.exec(errorObj); //Match the line:column in the error message
-    if (matches != null && matches.length >= 2) {
-      var line = JSCPPToAce(Number(matches[1]));
-      var column = Number(matches[2]) - 1;
-      var aceDoc = editor.getSession().getDocument();
-      var code = aceDoc.getValue();
-      var startOfErrorObj = { row: line, column: column };
-      var selectionRange = new ace.require("ace/range").Range.fromPoints(startOfErrorObj.row, startOfErrorObj.column, line, 0);
-      selectionRange.start = startOfErrorObj;
-      selectionRange.end = { row: line, column: 0 };
-      editor.getSession().getSelection().setSelectionRange(selectionRange);
-      editor.getSession().setAnnotations([{
-        row: startOfErrorObj.row,
-        column: startOfErrorObj.colum,
-        text: "Error!",
-        type: "error"
-      }]);
-      editor.navigateTo(startOfErrorObj.row, startOfErrorObj.column);
-      println("Error: " + errorObj.slice(errorObj.indexOf(matches[0]) + matches[0].length + 1), "red");
-    } else {
-      if (!errorObj.includes("Parsing Failure")) {
-        println("Warning: Unusual error!\n\n" + errorObj, "red");
-      } else {
-        println(errorObj, "red");
-      }
-    }
+    showFriendlyError(e.message);
     setRunning(false);
     setStatus("An error occurred! (See Output for details.)", "danger", false);
     jscpp.terminate();
@@ -652,9 +636,62 @@ function runCode(callback) {
   currentBoard.updateInputs();
 
   debug.sendUpdatedBreakpoints();
-  jscpp.postMessage({ type: "code", code: code, pinKeyframes: currentBoard.pinKeyframes, debugging: debug.isEnabled() });
+  jscpp.postMessage({ type: "code", code: code, pinKeyframes: currentBoard.pinKeyframes, debugging: debug.isEnabled(), boardType: currentBoard.type });
 }
 
+
+// ---------- Error display ----------
+// Uses GifferErrors (js/errorHints.js) to map the interpreter's error back to the student's
+// own line/token, then underlines it, adds a gutter marker, and prints a message + hint.
+var errorMarkerId = null;
+
+function clearErrorHighlight() {
+  if (errorMarkerId !== null) {
+    editor.getSession().removeMarker(errorMarkerId);
+    errorMarkerId = null;
+  }
+  editor.getSession().setAnnotations([]);
+}
+
+// Remove the red underline as soon as the student starts fixing things.
+editor.getSession().on("change", function () {
+  if (errorMarkerId !== null) { clearErrorHighlight(); }
+});
+
+function showFriendlyError(rawMessage) {
+  var prefixLineCount = currentPrefix.split("\n").length - 1;
+  var info;
+  try {
+    info = GifferErrors.explain(rawMessage, editor.getValue(), prefixLineCount);
+  } catch (err) {
+    console.error(err);
+    println("Error: " + rawMessage, "red");
+    return;
+  }
+
+  if (info.row !== null) {
+    var range = new Range(info.row, info.startCol, info.row, info.endCol);
+    errorMarkerId = editor.getSession().addMarker(range, "error-highlight", "text", false);
+    editor.getSession().setAnnotations([{
+      row: info.row,
+      column: info.startCol,
+      text: info.title + (info.hint ? "\n\nHint: " + info.hint : ""),
+      type: "error"
+    }]);
+    editor.scrollToLine(info.row, true, true, function () {});
+    editor.moveCursorTo(info.row, info.startCol);
+    editor.clearSelection();
+    println("Error on line " + (info.row + 1) + ": " + info.title, "red");
+  } else {
+    println("Error: " + info.title, "red");
+  }
+
+  if (info.hint) {
+    println("Hint: " + info.hint, "#b8860b");
+  }
+  // The raw interpreter text is still available for debugging in the browser console.
+  console.log("[giffer] raw error:", info.raw);
+}
 
 // //Exercises
 // function overwriteCode() {
@@ -675,63 +712,23 @@ function overwriteCode(includeComments = false) {
 
 // Basic C/C++ formatter: adjusts indentation for braces and preserves comments/preprocessor lines.
 function formatCode() {
+  // Indentation rules live in js/formatter.js (Arduino Ctrl+T style).
   var code = editor.getValue();
-  var lines = code.split(/\r?\n/);
-  var indentLevel = 0;
-  var indentStr = '  '; // two spaces
-  var inBlockComment = false;
-  var out = [];
+  var formatted = GifferFormat.format(code);
+  if (formatted === code) { editor.focus(); return; }
 
-  for (var i = 0; i < lines.length; i++) {
-    var raw = lines[i];
-    var trimmed = raw.trim();
-
-    if (trimmed.length === 0) {
-      out.push('');
-      continue;
-    }
-
-    // Preserve preprocessor directives at column 0
-    if (trimmed.startsWith('#')) {
-      out.push(trimmed);
-      continue;
-    }
-
-    // Handle block comments
-    if (inBlockComment) {
-      out.push(indentStr.repeat(indentLevel) + trimmed);
-      if (trimmed.includes('*/')) inBlockComment = false;
-      continue;
-    }
-    if (trimmed.startsWith('/*')) {
-      out.push(indentStr.repeat(indentLevel) + trimmed);
-      if (!trimmed.includes('*/')) inBlockComment = true;
-      continue;
-    }
-
-    // If line starts with a closing brace, dedent first
-    if (/^}/.test(trimmed)) {
-      indentLevel = Math.max(0, indentLevel - 1);
-    }
-
-    var currentIndent = indentStr.repeat(indentLevel);
-    out.push(currentIndent + trimmed);
-
-    // Update indent level by counting braces on the line
-    var opens = (trimmed.match(/{/g) || []).length;
-    var closes = (trimmed.match(/}/g) || []).length;
-    indentLevel += opens - closes;
-    if (indentLevel < 0) indentLevel = 0;
-  }
-
-  var formatted = out.join('\n');
-
-  // Preserve cursor position as best-effort
+  // Keep the cursor on the same code character: shift it by how much that line's indent changed.
   var cursor = editor.getCursorPosition();
-  editor.session.setValue(formatted);
-  try { editor.resize(); } catch (e) {}
+  var oldLine = editor.session.getLine(cursor.row);
+  var oldIndent = oldLine.length - oldLine.replace(/^\s+/, "").length;
+
+  // doc.setValue (unlike session.setValue) keeps undo history, so Ctrl+Z undoes a format.
+  editor.session.getDocument().setValue(formatted);
+
   var row = Math.min(cursor.row, editor.session.getLength() - 1);
-  var column = Math.min(cursor.column, editor.session.getLine(row).length);
+  var newLine = editor.session.getLine(row);
+  var newIndent = newLine.length - newLine.replace(/^\s+/, "").length;
+  var column = Math.max(newIndent, Math.min(cursor.column - oldIndent + newIndent, newLine.length));
   editor.moveCursorTo(row, column);
   editor.clearSelection();
   editor.focus();

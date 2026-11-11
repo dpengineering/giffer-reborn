@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giffer Reborn</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/terminal.css">
-  <link rel="stylesheet" href="css/styles/androidstudio.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.10-2210">
+  <link rel="stylesheet" href="css/main.css?v=2026.11.10-2210">
+  <link rel="stylesheet" href="css/terminal.css?v=2026.11.10-2210">
+  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.10-2210">
 </head>
 <body>
 <nav class="navbar sticky-top navbar-light bg-light">
@@ -293,11 +293,32 @@
                 <span class="input-group-text"><strong>Theme</strong></span>
               </div>
               <select class="form-control theme-selector" id="themes">
-                <option selected value="chrome">Chrome (light)</option>
-                <option value="cobalt">Cobalt (dark)</option>
-                <option value="merbivore_soft">Merbivore (dark)</option>
-                <option value="monokai">Monokai (dark)</option>
-                <option value="xcode">XCode (light)</option>
+                <optgroup label="Light">
+                  <option value="chrome" selected>Chrome</option>
+                  <option value="xcode">XCode</option>
+                  <option value="github">GitHub</option>
+                  <option value="solarized_light">Solarized Light</option>
+                  <option value="tomorrow">Tomorrow</option>
+                  <option value="dawn">Dawn</option>
+                  <option value="eclipse">Eclipse</option>
+                </optgroup>
+                <optgroup label="Dark">
+                  <option value="one_dark">One Dark</option>
+                  <option value="dracula">Dracula</option>
+                  <option value="monokai">Monokai</option>
+                  <option value="github_dark">GitHub Dark</option>
+                  <option value="nord_dark">Nord</option>
+                  <option value="solarized_dark">Solarized Dark</option>
+                  <option value="gruvbox">Gruvbox</option>
+                  <option value="tomorrow_night">Tomorrow Night</option>
+                  <option value="tomorrow_night_eighties">Tomorrow Night 80s</option>
+                  <option value="cobalt">Cobalt</option>
+                  <option value="merbivore_soft">Merbivore</option>
+                  <option value="twilight">Twilight</option>
+                  <option value="cloud9_night">Cloud9 Night</option>
+                  <option value="pastel_on_dark">Pastel on Dark</option>
+                  <option value="terminal">Terminal</option>
+                </optgroup>
               </select>
             </div>
           </div>
@@ -497,21 +518,23 @@ int main() {
 
 <div id="highlight-storage" style="display: none; width: 0.01px; height: 0.01px;"></div>
 
-<script src="js/jquery-2.2.1.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap.bundle.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/FrameManager.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/gif/gif.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/FileSaver.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/clipboard.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/highlight.pack.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/quizChunks.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/Debugger.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/three.min.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/OrbitControls.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/Board.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/terminal.js" type="text/javascript" charset="utf-8"></script>
-<script src="js/main.js" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.2.1.min.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap.bundle.min.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ace.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/FrameManager.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/gif/gif.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/FileSaver.min.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/clipboard.min.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/highlight.pack.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/errorHints.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/formatter.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/quizChunks.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/Debugger.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/three.min.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/OrbitControls.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/Board.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/terminal.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
+<script src="js/main.js?v=2026.11.10-2210" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>
