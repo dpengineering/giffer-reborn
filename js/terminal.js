@@ -410,6 +410,7 @@
     whoami:  "whoami                who are you?",
     history: "history               commands you've typed",
     clear:   "clear                 clear the screen",
+    fullscreen: "fullscreen            toggle full screen (Esc to leave)",
     reset:   "reset                 fall back to the surface of a NEW well",
     exit:    "exit                  close the terminal"
   };
@@ -441,8 +442,21 @@
   };
   Shell.prototype._err = function (text) { this._out(text, "err"); };
 
+  // The prompt only shows the last two rooms (like bash's PROMPT_DIRTRIM=2) so deep paths
+  // don't push the cursor off the screen. `pwd` always prints the full path.
+  var PROMPT_DEPTH = 2;
   Shell.prototype.prompt = function () {
-    return (this.root ? "root" : "you") + "@well:" + this.displayPath(this.s.cwd) + (this.root ? "# " : "$ ");
+    return (this.root ? "root" : "you") + "@well:" + this.shortPath(this.s.cwd) + (this.root ? "# " : "$ ");
+  };
+  Shell.prototype.shortPath = function (parts) {
+    var full = this.displayPath(parts);
+    var segs = full.split("/");
+    // "~/a/b/c" -> segs ["~","a","b","c"]; keep the root marker + last PROMPT_DEPTH rooms.
+    if (segs.length - 1 <= PROMPT_DEPTH) return full;
+    return "\u2026/" + segs.slice(-PROMPT_DEPTH).join("/");
+  };
+  Shell.prototype.isPromptTrimmed = function () {
+    return this.shortPath(this.s.cwd) !== this.displayPath(this.s.cwd);
   };
   Shell.prototype.displayPath = function (parts) {
     var p = "/" + parts.join("/");
@@ -717,6 +731,7 @@
   Shell.prototype.cmd_pwd = function () { this._out("/" + this.s.cwd.join("/")); };
   Shell.prototype.cmd_whoami = function () { this._out(this.root ? "root" : "you"); };
   Shell.prototype.cmd_clear = function (args, result) { result.clear = true; };
+  Shell.prototype.cmd_fullscreen = function (args, result) { result.fullscreen = true; };
   Shell.prototype.cmd_exit = function (args, result) { result.exit = true; };
   Shell.prototype.cmd_echo = function (args) { this._out(args.join(" ")); };
   Shell.prototype.cmd_history = function () {
@@ -1006,6 +1021,7 @@
     ui.el = document.createElement("div");
     ui.el.id = "terminal-1337";
     ui.el.innerHTML =
+      '<button class="t1337-fs" type="button" title="Full screen (Esc to leave)" aria-label="Toggle full screen">\u26f6</button>' +
       '<div class="t1337-screen"></div>' +
       '<div class="t1337-line"><span class="t1337-prompt"></span>' +
       '<input class="t1337-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></div>';
@@ -1018,6 +1034,18 @@
       ui.input.focus();
     });
     ui.input.addEventListener("keydown", onKey);
+    ui.el.querySelector(".t1337-fs").addEventListener("click", function (e) {
+      e.stopPropagation();
+      toggleFullscreen();
+      ui.input.focus();
+    });
+  }
+
+  function toggleFullscreen(force) {
+    var on = (force === undefined) ? !ui.el.classList.contains("t1337-full") : force;
+    ui.el.classList.toggle("t1337-full", on);
+    document.body.classList.toggle("t1337-noscroll", on);
+    scrollDown();
   }
 
   function addLine(line) {
@@ -1056,7 +1084,12 @@
     addLines(res.lines);
     if (res.password) ui.mode = "password";
     if (res.pager) startPager(res.pager);
+    if (res.fullscreen) toggleFullscreen();
     if (res.exit) { persist(); hide(); return; }
+    if (!ui.shell.s.trimTip && ui.shell.isPromptTrimmed()) {
+      ui.shell.s.trimTip = true;
+      addLines([{ text: "(you're deep now -- the prompt only shows the last two rooms. `pwd` prints the whole path.)", cls: "dim" }]);
+    }
     persist();
     setPrompt();
     scrollDown();
@@ -1064,7 +1097,7 @@
 
   // ---- less ----
   function pageSize() {
-    var lineHeight = 18;
+    var lineHeight = parseFloat(getComputedStyle(ui.el).lineHeight) || 18; // 21px in full screen
     return Math.max(5, Math.floor(ui.el.clientHeight / lineHeight) - 3);
   }
   function startPager(lines) {
@@ -1151,6 +1184,9 @@
       ui.input.value = "";
       ui.mode = "normal";
       setPrompt();
+    } else if (e.key === "Escape" && ui.el.classList.contains("t1337-full")) {
+      e.preventDefault();
+      toggleFullscreen(false);
     } else if (e.key === "l" && e.ctrlKey) {
       e.preventDefault();
       ui.screen.innerHTML = "";
@@ -1197,6 +1233,7 @@
 
   function hide() {
     if (!ui.el) return;
+    toggleFullscreen(false);
     ui.el.style.display = "none";
     var consoleOut = document.getElementById("console-output");
     if (consoleOut) consoleOut.style.display = "";

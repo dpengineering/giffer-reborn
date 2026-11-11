@@ -40,3 +40,34 @@
   padding: 0;
   caret-color: #8fe3a0;
 }
+
+/* Full-screen toggle button (top-right, stays put while the terminal scrolls) */
+#terminal-1337 .t1337-fs {
+  position: sticky;
+  top: 0;
+  float: right;
+  z-index: 1;
+  background: rgba(20, 24, 33, 0.85);
+  color: #8fe3a0;
+  border: 1px solid #2a3140;
+  border-radius: 4px;
+  font-size: 15px;
+  line-height: 1;
+  padding: 3px 6px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+#terminal-1337 .t1337-fs:hover { opacity: 1; }
+
+/* Full screen: cover the whole window */
+#terminal-1337.t1337-full {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  height: auto !important;
+  z-index: 2000;
+  border-radius: 0;
+  padding: 16px 20px;
+  font-size: 15px;
+  line-height: 21px;
+}
+body.t1337-noscroll { overflow: hidden; }
