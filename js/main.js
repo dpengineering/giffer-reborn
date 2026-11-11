@@ -636,7 +636,9 @@ function runCode(callback) {
   currentBoard.updateInputs();
 
   debug.sendUpdatedBreakpoints();
-  jscpp.postMessage({ type: "code", code: code, pinKeyframes: currentBoard.pinKeyframes, debugging: debug.isEnabled(), boardType: currentBoard.type });
+  var stepFromStart = debug.consumeStepFromStart();
+  debug.resetView();
+  jscpp.postMessage({ type: "code", code: code, pinKeyframes: currentBoard.pinKeyframes, debugging: debug.isEnabled() || stepFromStart, stepFromStart: stepFromStart, boardType: currentBoard.type });
 }
 
 

@@ -118,9 +118,11 @@ div.form-group label {
     background: LightCoral;
 }
 
+/* Debugger: the exact piece of code that runs next (outlined inside the red line) */
 .current-line {
-    background: LightCoral;
     position: absolute;
+    background: rgba(229, 57, 53, 0.18);
+    border-bottom: 2px solid rgba(229, 57, 53, 0.8);
 }
 
 
@@ -163,4 +165,105 @@ div.form-group label {
     position: absolute;
     background: rgba(255, 60, 60, 0.25);
     border-bottom: 2px wavy #e53935;
+}
+
+/* ---------- Debugger visuals (js/Debugger.js) ---------- */
+/* Whole-line highlights: green = just ran, red = runs next */
+.dbg-line-prev { position: absolute; background: rgba(67, 160, 71, 0.13); }
+.dbg-line-next { position: absolute; background: rgba(229, 57, 53, 0.10); }
+
+/* Gutter arrows, in the space Ace leaves left of the line number */
+.ace_gutter-cell.dbg-gutter-prev::before,
+.ace_gutter-cell.dbg-gutter-next::before {
+    content: "\279C";
+    position: absolute;
+    left: 2px;
+    font-weight: bold;
+    font-size: 1.15em;
+}
+.ace_gutter-cell.dbg-gutter-prev::before { color: #43a047; }
+.ace_gutter-cell.dbg-gutter-next::before { color: #e53935; }
+
+#debugging-buttons .btn { margin: 0 4px 6px 0; }
+
+#debug-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    margin: 6px 0 12px;
+    font-size: 0.85rem;
+    color: #555;
+}
+#debug-step-count { margin-left: auto; font-weight: bold; color: #333; }
+.dbg-arrow { font-weight: bold; }
+.dbg-arrow-prev { color: #43a047; }
+.dbg-arrow-next { color: #e53935; }
+
+#debug-frames { max-height: 55vh; overflow-y: auto; }
+.dbg-empty { color: #777; font-size: 0.9rem; }
+
+/* One card per function call; the newest (running) call is on top */
+.dbg-frame {
+    border: 1px solid #d6dbe1;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: #fafbfc;
+    opacity: 0.75;
+}
+.dbg-frame-active { opacity: 1; border-color: #7aa7e6; background: #f3f8ff; box-shadow: 0 1px 4px rgba(60, 110, 190, 0.18); }
+.dbg-frame-title {
+    font-family: Menlo, Consolas, monospace;
+    font-weight: bold;
+    font-size: 0.9rem;
+    padding: 5px 10px;
+    border-bottom: 1px solid #e3e7ec;
+}
+.dbg-frame-badge {
+    margin-left: 8px;
+    font-family: inherit;
+    font-size: 0.7rem;
+    font-weight: normal;
+    color: #fff;
+    background: #e53935;
+    border-radius: 8px;
+    padding: 1px 7px;
+    vertical-align: middle;
+}
+.dbg-novars { padding: 6px 10px; color: #999; font-size: 0.85rem; font-style: italic; }
+
+.dbg-var {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 10px;
+    font-family: Menlo, Consolas, monospace;
+    font-size: 0.9rem;
+}
+.dbg-var + .dbg-var { border-top: 1px dashed #e6e9ed; }
+.dbg-var-name { min-width: 7em; text-align: right; }
+.dbg-var-type { display: block; font-size: 0.7rem; color: #999; }
+.dbg-var-value { display: flex; flex-wrap: wrap; gap: 3px; }
+
+/* A variable is a labeled box holding a value */
+.dbg-box, .dbg-cell {
+    display: inline-block;
+    min-width: 2.4em;
+    padding: 2px 8px;
+    border: 1px solid #b9c2cc;
+    border-radius: 3px;
+    background: #fff;
+    text-align: center;
+}
+.dbg-cell { padding: 0 6px 2px; }
+.dbg-cell-index { display: block; font-size: 0.65rem; color: #999; }
+
+/* Value changed on this step (or variable just appeared) */
+.dbg-changed {
+    background: #fff3b0;
+    border-color: #e0b400;
+    animation: dbg-flash 0.9s ease-out;
+}
+@keyframes dbg-flash {
+    from { background: #ffd54f; transform: scale(1.12); }
+    to   { background: #fff3b0; transform: scale(1); }
 }

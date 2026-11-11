@@ -637,10 +637,57 @@ function submitFrameManager() {
   this.postMessage(JSON.stringify(out));
 }
 
+// Variables grouped into stack frames, Python Tutor style:
+//   [{name: "Global", vars: [...]}, {name: "loop", vars: [...]}, {name: "blinkDigit", vars: [...]}]
+// JSCPP pushes one scope per function call ("function NAME") plus unnamed scopes for blocks
+// (if/for bodies); block scopes are folded into the function frame they belong to.
+function collectFrames() {
+  var rt = cppdebugger.rt;
+  var frames = [];
+  rt.scope.forEach(function (scope) {
+    var scopeName = scope["$name"];
+    if (scopeName === "global") {
+      frames.push({name: "Global", vars: []});
+    } else if (typeof scopeName === "string" && scopeName.indexOf("function ") === 0) {
+      frames.push({name: scopeName.slice("function ".length), vars: []});
+    } else if (!frames.length) {
+      frames.push({name: "Global", vars: []});
+    }
+    var frame = frames[frames.length - 1];
+    for (var name in scope) {
+      var val = scope[name];
+      if (name === "$name" || typeof val !== "object" || val === null || !("t" in val) || !("v" in val)) {
+        continue;
+      }
+      var entry = {name: name, type: "", value: ""};
+      try {
+        entry.type = rt.makeTypeString(val.t);
+        if (rt.isFunctionType && rt.isFunctionType(val.t)) { continue; }
+        if (rt.isPointerType(val.t) && rt.isArrayType(val.t) && !rt.isTypeEqualTo(val.t.eleType, rt.charTypeLiteral)) {
+          entry.elems = val.v.target.slice(val.v.position).map(function (e) {
+            return String(rt.makeValueString(e, {noArray: true}));
+          });
+        } else {
+          entry.value = String(rt.makeValueString(val));
+        }
+      } catch (e) {
+        entry.value = "?";
+      }
+      if (entry.value === "<function>") { continue; }
+      frame.vars.push(entry);
+    }
+  });
+  return frames;
+}
+
 function submitDebuggerState() {
+  var prev = cppdebugger.prevNode;
   this.postMessage(JSON.stringify({type: "debuginfo",
     variables: cppdebugger.variable(),
+    frames: collectFrames(),
     node: cppdebugger.nextNode(),
+    // The node that ran just before this pause -> the "just executed" line.
+    prevLine: prev && typeof prev.sLine === "number" ? prev.sLine : null,
     frameManager: frameManager}));
 }
 
@@ -703,7 +750,8 @@ function messageHandler(event) {
       };
 
       cppdebugger.stopConditions["breakpoints"] = true;
-      setLineByLine(false);
+      // "Step from start": pause on every new line from the very beginning, no breakpoint needed.
+      setLineByLine(!!event.data.stepFromStart);
 
       qualifiedContinue();
     } else {

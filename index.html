@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giffer Reborn</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.10-2232">
-  <link rel="stylesheet" href="css/main.css?v=2026.11.10-2232">
-  <link rel="stylesheet" href="css/terminal.css?v=2026.11.10-2232">
-  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.10-2232">
+  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-1031">
+  <link rel="stylesheet" href="css/main.css?v=2026.11.11-1031">
+  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-1031">
+  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-1031">
 </head>
 <body>
 <nav class="navbar sticky-top navbar-light bg-light">
@@ -88,25 +88,18 @@
                     </div>
                     <br>
                     <div id="debugging-buttons">
-                      <button class="btn btn-info" onclick="debug.doContinue()">Run to Next</button>
-                      <button class="btn btn-secondary" onclick="debug.doStepLine()">Step Line</button>
-                      <button class="btn btn-secondary" onclick="debug.doStepExpression()">Step Expression</button>
+                      <button class="btn btn-success" onclick="debug.startStepping()" title="Run your code and pause on the very first line. No breakpoint needed.">&#9654; Step from Start</button>
+                      <button class="btn btn-info" onclick="debug.doContinue()" title="Run until the next breakpoint">Run to Next</button>
+                      <button class="btn btn-secondary" onclick="debug.doStepLine()" title="Run the next line, then pause">Step Line</button>
+                      <button class="btn btn-secondary" onclick="debug.doStepExpression()" title="Run one small piece of the line, then pause">Step Expression</button>
                     </div>
-                    <br>
-                    <br>
-                    <div id="variables-table">
-                      <table class="table">
-                        <thead>
-                        <tr>
-                          <th scope="col">Type</th>
-                          <th scope="col">Variable</th>
-                          <th scope="col">Value</th>
-                        </tr>
-                        </thead>
-                        <tbody id="variables-table-body">
-
-                        </tbody>
-                      </table>
+                    <div id="debug-legend">
+                      <span><span class="dbg-arrow dbg-arrow-prev">&#10140;</span> line that just ran</span>
+                      <span><span class="dbg-arrow dbg-arrow-next">&#10140;</span> next line to run</span>
+                      <span id="debug-step-count"></span>
+                    </div>
+                    <div id="debug-frames">
+                      <p class="dbg-empty">Press <strong>Step from Start</strong>, or click a line number to set a breakpoint and press Run. Your variables will show up here while the code is paused.</p>
                     </div>
                   </div>
                   <div class="tab-pane fade" id="dev" role="tabpanel" aria-labelledby="dev-tab">
@@ -239,13 +232,11 @@
         To see what your code is expected to do, click the green "Run & Grade" button at the top.<br>
         <br><br>
         <h4>Debugging</h4>
-        Under the "Debugging" tab, there is a checkbox to "Enable Breakpoints".<br>
-        If you click next to a line number on the left of your code, you can add a breakpoint.<br>
-        When breakpoints are enabled, the program will halt execution when it reaches the breakpoint.<br>
-        Once the program has halted, you can view the current variables and their values.<br>
-        You can press "Step" to step to the next line of execution, this might take you into a function.<br>
-        You can press "Continue" to skip to the next breakpoint.<br>
-        At any time during debugging, you can disable breakpoints to finish executing.<br>
+        Under the "Debugging" tab, press <strong>Step from Start</strong> to pause on the first line of your code, then <strong>Step Line</strong> to run it one line at a time.<br>
+        A <span style="color:#43a047;font-weight:bold">green arrow</span> marks the line that just ran, and a <span style="color:#e53935;font-weight:bold">red arrow</span> marks the next line to run.<br>
+        Each function call gets its own box of variables. Values that just changed light up yellow.<br>
+        Click next to a line number to add a breakpoint, then <strong>Run to Next</strong> skips ahead to it.<br>
+        Before you step, try to predict what will change. Then check!<br>
         <br><br>
         <h4>Submitting</h4>
         Once you've solved an exercise, save your code in the Google Doc provided by your teacher.<br>
@@ -518,23 +509,23 @@ int main() {
 
 <div id="highlight-storage" style="display: none; width: 0.01px; height: 0.01px;"></div>
 
-<script src="js/jquery-2.2.1.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap.bundle.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/ace/ace.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/FrameManager.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/gif/gif.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/FileSaver.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/clipboard.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/highlight.pack.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/errorHints.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/formatter.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/quizChunks.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/Debugger.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/three.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/OrbitControls.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/Board.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/terminal.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/main.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.2.1.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap.bundle.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ace.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/FrameManager.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/gif/gif.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/FileSaver.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/clipboard.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/highlight.pack.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/errorHints.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/formatter.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/quizChunks.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/Debugger.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/three.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/OrbitControls.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/Board.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/terminal.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/main.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>
