@@ -1,6 +1,8 @@
 // self.location.search is the ?v= version main.js started this worker with (cache-busting).
 importScripts("FrameManager.js" + self.location.search);
 importScripts("ArduinoClasses.js" + self.location.search);
+importScripts("errorHints.js" + self.location.search);  // stripCode, used by rangeFor.js
+importScripts("rangeFor.js" + self.location.search);    // rewrites range-based for loops
 
 var breakpoints = [];
 var frameManager;
@@ -680,6 +682,22 @@ function collectFrames() {
   return frames;
 }
 
+function describeLastEval() {
+  var interp = cppdebugger.rt.interp, rt = cppdebugger.rt;
+  var e = interp.lastEval;
+  if (!e || e.node !== interp.currentNode) { return null; }
+  var value;
+  try {
+    if (e.value === undefined || e.value === null || !e.value.t) { value = "done"; }
+    else if (rt.isFunctionType && rt.isFunctionType(e.value.t)) { return null; }
+    else if (e.value.t.name === "void") { value = "done"; }
+    else { value = String(rt.makeValueString(e.value)); }
+  } catch (err) { value = "?"; }
+  if (value === "<function>") { return null; }
+  var n = e.node;
+  return {sLine: n.sLine, sColumn: n.sColumn, eLine: n.eLine, eColumn: n.eColumn, type: n.type, value: value};
+}
+
 function submitDebuggerState() {
   var prev = cppdebugger.prevNode;
   this.postMessage(JSON.stringify({type: "debuginfo",
@@ -688,6 +706,8 @@ function submitDebuggerState() {
     node: cppdebugger.nextNode(),
     // The node that ran just before this pause -> the "just executed" line.
     prevLine: prev && typeof prev.sLine === "number" ? prev.sLine : null,
+    // What was just computed at this pause (for Step Expression), e.g. arr[i] -> 2.
+    evaluated: describeLastEval(),
     frameManager: frameManager}));
 }
 
@@ -722,7 +742,7 @@ function enableAll() {
 
 function messageHandler(event) {
   if (event.data.type === "code") {
-    var code = event.data.code;
+    var code = RangeFor.transform(event.data.code);
     setPinKeyframes(event.data.pinKeyframes);
     var debugging = event.data.debugging;
     boardType = event.data.boardType || null;
@@ -739,7 +759,16 @@ function messageHandler(event) {
     cppdebugger = JSCPP.run(code, "", config);
 
     if (config.debug) {
+      var interp = cppdebugger.rt.interp;
+      // Extra pauses after compound expressions finish (for Step Expression's values).
+      interp.yieldComposites = true;
+      // Line stepping and breakpoints ignore those extra pauses.
+      cppdebugger.conditions["lineChanged"] = function (prev, next) {
+        if (interp.compositeYield) { return false; }
+        return (prev != null ? prev.sLine : void 0) !== next.sLine;
+      };
       cppdebugger.conditions["breakpoints"] = function (prev, next) {
+        if (interp.compositeYield) { return false; }
         var previous = lastLine;
         lastLine = next.sLine;
         if (breakpoints.includes(next.sLine) && previous !== next.sLine) {

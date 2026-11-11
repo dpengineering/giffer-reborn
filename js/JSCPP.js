@@ -14547,6 +14547,10 @@ Interpreter = function(rt) {
   };
 };
 
+// giffer: compound expressions worth pausing after in "Step Expression" (wrappers like
+// parentheses/constants are left out so values don't show twice).
+var COMPOSITE_EXPRESSIONS = /^(BinOpExpression|CastExpression|ConditionalExpression|LogicalANDExpression|LogicalORExpression|PostfixExpression_(ArrayAccess|MethodInvocation|PostIncrement|PostDecrement)|UnaryExpression(_PreIncrement|_PreDecrement|_Sizeof_Expr|_Sizeof_Type)?)$/;
+
 Interpreter.prototype.visit = function*(interp, s, param) {
   var _node, f, ret, rt;
   rt = interp.rt;
@@ -14563,8 +14567,19 @@ Interpreter.prototype.visit = function*(interp, s, param) {
       f = this.visitors[s.type];
       if (isGeneratorFunction(f)) {
         ret = (yield* f(interp, s, param));
+        // giffer: while debugging, also pause after a compound expression (a[i], x + 1, f(...))
+        // has been computed, so "Step Expression" can show its value. compositeYield lets the
+        // line-stepping/breakpoint conditions skip these extra pauses.
+        if (this.yieldComposites && COMPOSITE_EXPRESSIONS.test(s.type)) {
+          this.lastEval = {node: s, value: ret};
+          this.compositeYield = true;
+          yield ret;
+          this.compositeYield = false;
+        }
       } else {
-        yield (ret = f(interp, s, param));
+        ret = f(interp, s, param);
+        if (this.yieldComposites) { this.lastEval = {node: s, value: ret}; }
+        yield ret;
       }
     } else {
       ret = this.visitors["unknown"](interp, s, param);
@@ -14606,7 +14621,9 @@ Interpreter.prototype.arrayInit = function*(dimensions, init, level, type, param
           init.Initializers = arr;
         } else if (init.Initializers.length === 1 && this.rt.isIntegerType(type)) {
           val = this.rt.cast(type, (yield* this.visit(this, init.Initializers[0].Expression, param)));
-          if (val.v === -1 || val.v === 0) {
+          // giffer fix: C sets only the first element ({0} happens to zero everything). This used to
+          // fill all elements for {-1}, and store a raw -1 instead of the value for e.g. {4}.
+          if (val.v === 0) {
             arr = new Array(curDim);
             i = 0;
             while (i < curDim) {
@@ -14619,7 +14636,10 @@ Interpreter.prototype.arrayInit = function*(dimensions, init, level, type, param
             init.Initializers = arr;
           } else {
             arr = new Array(curDim);
-            arr[0] = this.rt.val(type, -1);
+            arr[0] = {
+              type: "Initializer_expr",
+              shorthand: val
+            };
             i = 1;
             while (i < curDim) {
               arr[i] = {
@@ -14815,9 +14835,7 @@ module.exports = {
       mydebugger.src = code;
     }
     result = PEGUtil.parse(ast, code);
-    if (code.includes(":")) {
-      throw "Range-based for loops are not supported. Please use traditional for loops."
-    }
+    // (Range-based for loops are rewritten into index loops before this point, see js/rangeFor.js.)
     if (result.error != null) {
       throw "ERROR: Parsing Failure:\n" + PEGUtil.errorMessage(result.error, true);
     }

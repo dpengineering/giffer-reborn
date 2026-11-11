@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giffer Reborn</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-1031">
-  <link rel="stylesheet" href="css/main.css?v=2026.11.11-1031">
-  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-1031">
-  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-1031">
+  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-1116">
+  <link rel="stylesheet" href="css/main.css?v=2026.11.11-1116">
+  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-1116">
+  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-1116">
 </head>
 <body>
 <nav class="navbar sticky-top navbar-light bg-light">
@@ -92,12 +92,19 @@
                       <button class="btn btn-info" onclick="debug.doContinue()" title="Run until the next breakpoint">Run to Next</button>
                       <button class="btn btn-secondary" onclick="debug.doStepLine()" title="Run the next line, then pause">Step Line</button>
                       <button class="btn btn-secondary" onclick="debug.doStepExpression()" title="Run one small piece of the line, then pause">Step Expression</button>
+                      <button class="btn btn-outline-secondary" id="debug-step-back" onclick="debug.stepBack()" title="Go back one step" disabled>&#8630; Step Back</button>
+                    </div>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" type="checkbox" id="debug-predict" onchange="debug.togglePredict()">
+                      <label class="custom-control-label" for="debug-predict">&#128302; Predict first: hide new values until I guess them</label>
                     </div>
                     <div id="debug-legend">
                       <span><span class="dbg-arrow dbg-arrow-prev">&#10140;</span> line that just ran</span>
                       <span><span class="dbg-arrow dbg-arrow-next">&#10140;</span> next line to run</span>
                       <span id="debug-step-count"></span>
                     </div>
+                    <div id="debug-predict-banner" class="dbg-predict-banner" style="display: none;"></div>
+                    <div id="debug-trail" style="display: none;"></div>
                     <div id="debug-frames">
                       <p class="dbg-empty">Press <strong>Step from Start</strong>, or click a line number to set a breakpoint and press Run. Your variables will show up here while the code is paused.</p>
                     </div>
@@ -236,7 +243,8 @@
         A <span style="color:#43a047;font-weight:bold">green arrow</span> marks the line that just ran, and a <span style="color:#e53935;font-weight:bold">red arrow</span> marks the next line to run.<br>
         Each function call gets its own box of variables. Values that just changed light up yellow.<br>
         Click next to a line number to add a breakpoint, then <strong>Run to Next</strong> skips ahead to it.<br>
-        Before you step, try to predict what will change. Then check!<br>
+        <strong>Step Expression</strong> runs one piece of a line at a time and lists each value it computes, like <code>arr[i] &rarr; 2</code>.<br>
+        <strong>Step Back</strong> goes back one step. Turn on <strong>Predict first</strong> to guess each new value before it's shown.<br>
         <br><br>
         <h4>Submitting</h4>
         Once you've solved an exercise, save your code in the Google Doc provided by your teacher.<br>
@@ -509,23 +517,23 @@ int main() {
 
 <div id="highlight-storage" style="display: none; width: 0.01px; height: 0.01px;"></div>
 
-<script src="js/jquery-2.2.1.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap.bundle.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/ace/ace.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/FrameManager.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/gif/gif.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/FileSaver.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/clipboard.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/highlight.pack.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/errorHints.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/formatter.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/quizChunks.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/Debugger.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/three.min.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/OrbitControls.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/Board.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/terminal.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
-<script src="js/main.js?v=2026.11.11-1031" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.2.1.min.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap.bundle.min.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ace.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/FrameManager.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/gif/gif.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/FileSaver.min.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/clipboard.min.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/highlight.pack.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/errorHints.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/formatter.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/quizChunks.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/Debugger.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/three.min.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/OrbitControls.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/Board.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/terminal.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
+<script src="js/main.js?v=2026.11.11-1116" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>

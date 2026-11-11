@@ -159,6 +159,8 @@ function applyTheme() {
 
 //Debug
 var debug = new Debugger(editor);
+// Remember the "Predict first" checkbox between visits.
+try { document.getElementById("debug-predict").checked = localStorage.getItem("giffer-predict-mode") === "1"; } catch (e) {}
 
 //Fields
 var nameField = document.getElementById("name");

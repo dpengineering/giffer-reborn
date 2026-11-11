@@ -267,3 +267,49 @@ div.form-group label {
     from { background: #ffd54f; transform: scale(1.12); }
     to   { background: #fff3b0; transform: scale(1); }
 }
+
+/* Step Expression trail */
+#debug-trail {
+    border: 1px solid #d6dbe1;
+    border-left: 4px solid #7aa7e6;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    background: #fbfcfe;
+    font-size: 0.85rem;
+}
+.dbg-trail-title { font-weight: bold; margin-bottom: 3px; }
+.dbg-trail-item { padding: 1px 0; color: #777; }
+.dbg-trail-item code { color: #555; background: #eef1f5; padding: 1px 4px; border-radius: 3px; }
+.dbg-trail-latest { color: #222; font-weight: bold; }
+.dbg-trail-latest code { color: #000; background: #ffe9a8; }
+
+/* Predict first */
+.dbg-predict-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 10px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    background: #f3eefe;
+    border: 1px solid #c9b8f5;
+    font-size: 0.9rem;
+}
+.dbg-predict-ask  { background: #fff7e0; border-color: #f0c45a; }
+.dbg-predict-good { background: #e9f7ec; border-color: #8bc99a; }
+.dbg-predict-miss { background: #fdeceb; border-color: #eba39e; }
+.dbg-guess {
+    width: 4.5em;
+    padding: 1px 4px;
+    border: 2px dashed #e0a800;
+    border-radius: 3px;
+    background: #fffdf3;
+    text-align: center;
+    font-family: Menlo, Consolas, monospace;
+}
+.dbg-cell .dbg-guess { width: 3em; }
+.dbg-right { color: #2e7d32; font-weight: bold; }
+.dbg-wrong { color: #c62828; font-size: 0.8rem; }
+#debug-step-back:disabled { opacity: 0.4; }
