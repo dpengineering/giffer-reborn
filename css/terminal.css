@@ -1,0 +1,42 @@
+/* Hidden terminal (Exercise 1337 easter egg). See js/terminal.js. */
+#terminal-1337 {
+  display: none;
+  font-family: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 18px;
+  background: radial-gradient(ellipse at top, #12161f 0%, #07080b 75%);
+  color: #c9d1c3;
+  border-radius: 4px;
+  padding: 8px 10px;
+  overflow: auto;
+  min-height: 300px;
+  cursor: text;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+}
+#terminal-1337 .t1337-out {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+#terminal-1337 .t1337-item { margin-right: 2ch; white-space: pre; display: inline-block; }
+#terminal-1337 .t1337-dir  { color: #7fb2ff; }
+#terminal-1337 .t1337-err  { color: #ff8a80; }
+#terminal-1337 .t1337-good { color: #8fe3a0; }
+#terminal-1337 .t1337-dim  { color: #6f7a86; font-style: italic; }
+#terminal-1337 .t1337-cmd  { color: #e8e8e8; }
+#terminal-1337 .t1337-more { color: #07080b; background: #c9d1c3; display: inline-block; padding: 0 4px; }
+#terminal-1337 .t1337-glow {
+  color: #c7b8ff;
+  text-shadow: 0 0 6px rgba(167, 139, 250, 0.7);
+}
+#terminal-1337 .t1337-line { display: flex; white-space: pre; }
+#terminal-1337 .t1337-prompt { color: #8fe3a0; }
+#terminal-1337 .t1337-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e8e8e8;
+  font: inherit;
+  padding: 0;
+  caret-color: #8fe3a0;
+}

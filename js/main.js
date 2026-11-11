@@ -553,6 +553,7 @@ function runCode(callback) {
     return;
   }
   setRunning(true);
+  if (typeof Terminal1337 !== "undefined") Terminal1337.onRunStart(); // hidden terminal (js/terminal.js)
   // This line changes the HTML paragraph above the Output GIF.
   setStatus("Running your code . . .", "info", true);
 
@@ -591,6 +592,10 @@ function runCode(callback) {
       renderFrameManger(newFrameManager);
 
       setStatus("Gif", "");
+
+      if (shouldGrade && typeof Terminal1337 !== "undefined") {
+        Terminal1337.onGraded(currentExercise.number, newFrameManager.grade === true); // hidden terminal (js/terminal.js)
+      }
 
       if (typeof callback !== "undefined") {
         callback(lastContent);
@@ -878,6 +883,7 @@ function loadExercise(promptForOverwrite) {
   hideCanvas();
 
   var exerciseNum = parseInt($("#exercise-number")[0].value);
+  if (typeof Terminal1337 !== "undefined") Terminal1337.onExerciseLoaded(exerciseNum); // hidden terminal (js/terminal.js)
   if (isNaN(exerciseNum)) {
     clearExercise();
     return;
