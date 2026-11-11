@@ -1,5 +1,6 @@
-importScripts("FrameManager.js");
-importScripts("ArduinoClasses.js");
+// self.location.search is the ?v= version main.js started this worker with (cache-busting).
+importScripts("FrameManager.js" + self.location.search);
+importScripts("ArduinoClasses.js" + self.location.search);
 
 var breakpoints = [];
 var frameManager;
@@ -738,4 +739,4 @@ function messageHandler(event) {
 
 this.addEventListener("message", messageHandler, false);
 
-importScripts("JSCPP.js");
+importScripts("JSCPP.js" + self.location.search);

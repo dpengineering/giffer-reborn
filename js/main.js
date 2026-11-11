@@ -1,3 +1,9 @@
+// Cache-busting version (e.g. "?v=2026.11.10-1530") taken from this script's own URL in
+// index.html, where deploy/bump-version.sh sets it. Passed on to the interpreter worker.
+var ASSET_VERSION = (function () {
+  try { return new URL(document.currentScript.src).search; } catch (e) { return ""; }
+})();
+
 "use strict";
 
 //Storage
@@ -571,7 +577,7 @@ function runCode(callback) {
   clearErrorHighlight();
 
   // Creates a dedicated web worker that executes the script. Essentially creates a new thread.
-  jscpp = new Worker("js/JSCPP-WebWorker.js");
+  jscpp = new Worker("js/JSCPP-WebWorker.js" + ASSET_VERSION);
 
   var shouldGrade = currentExercise.number !== null;
 

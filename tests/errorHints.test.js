@@ -11,7 +11,7 @@ const suffix = fs.readFileSync(path.join(repo, "js/main.js"), "utf8").match(/var
 
 function rawError(code) {
   const ctx = { console };
-  ctx.self = ctx; ctx.global = ctx; ctx.postMessage = () => {};
+  ctx.self = ctx; ctx.global = ctx; ctx.postMessage = () => {}; ctx.location = { search: "" };
   let handler;
   ctx.addEventListener = (t, h) => { handler = h; };
   ctx.importScripts = f => vm.runInContext(fs.readFileSync(path.join(repo, "js", f), "utf8"), ctx, { filename: f });
