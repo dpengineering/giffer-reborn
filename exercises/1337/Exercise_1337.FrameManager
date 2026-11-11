@@ -1,1 +1,358 @@
-{"number":"1337","startingCode":"void setup(){\n    //Serial.println(\"Setup called\");\n\n    pinMode(10, OUTPUT);\n}\n\nvoid loop(){\n    \n    digitalWrite(10, HIGH);\n    \n    delay(250);\n    Serial.print(\"After 250 ms, pin 1 is \");\n    Serial.println(analogRead(1));\n    \n    digitalWrite(10, LOW);\n    \n    delay(250);\n    Serial.print(\"After 500 ms, pin 1 is \");\n    Serial.println(analogRead(1));\n    \n    digitalWrite(10, HIGH);\n    \n    delay(500);\n    Serial.print(\"After 1000 ms, pin 1 is \");\n    Serial.println(analogRead(1));\n    \n    digitalWrite(10, LOW);\n    \n    delay(250);\n    \n}","suffix":"int main() {\nSerial.begin(9600);\n  setup();\n  loop();\nsetup();\n  return 0;\n}\n","board":{"type":"LED Board","setup":{"pinKeyframes":[]}},"frameManager":{"frames":[{"ledModes":{"10":1},"ledStates":{"10":1023},"postDelay":250,"outputText":[]},{"ledModes":{"10":1},"ledStates":{"10":0},"postDelay":250,"outputText":["After 250 ms,pin 1 is ","0\n"]},{"ledModes":{"10":1},"ledStates":{"10":1023},"postDelay":500,"outputText":["After 500 ms,pin 1 is ","0\n"]},{"ledModes":{"10":1},"ledStates":{"10":0},"postDelay":250,"outputText":["After 1000 ms,pin 1 is ","0\n"]},{"ledModes":{"10":1},"ledStates":{"10":0},"postDelay":0,"outputText":[]}],"currentFrame":4,"elapsedTime":1250,"isGraded":true,"grade":false}}
+{
+  "number": "1337",
+  "startingCode": "// Exercise 1337 - The Signal\n// Something is listening on pin 13. Send it the number 1 3 3 7.\n\nvoid setup() {\n  // Start Serial and set up pin 13\n\n}\n\nvoid loop() {\n  // Transmit each digit: 1, then 3, then 3, then 7\n\n}\n",
+  "suffix": "int main() {\n  setup();\n  loop();\n  return 0;\n}\n",
+  "board": {
+    "type": "LED Board",
+    "setup": {
+      "pinKeyframes": []
+    }
+  },
+  "frameManager": {
+    "frames": [
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": [
+          "1\n"
+        ]
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 1000,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": [
+          "3\n"
+        ]
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 1000,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": [
+          "3\n"
+        ]
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 1000,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": [
+          "7\n"
+        ]
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 1023
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 200,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 1000,
+        "outputText": []
+      },
+      {
+        "ledModes": {
+          "13": 1
+        },
+        "ledStates": {
+          "13": 0
+        },
+        "postDelay": 0,
+        "outputText": []
+      }
+    ],
+    "currentFrame": 32,
+    "elapsedTime": 9600,
+    "isGraded": true,
+    "grade": true
+  },
+  "directions": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>Arduino Lesson</title>\n  <link rel=\"stylesheet\" href=\"../../css/exercise-directions.css\">\n</head>\n<body>\n  <h1>Exercise 1337: The Signal</h1>\n  <p><em>Something is listening on pin 13. It only answers to one number.</em></p>\n\n  <h2>Your Mission</h2>\n  <p>Transmit the digits <b>1</b>, <b>3</b>, <b>3</b>, <b>7</b> by blinking the LED on pin 13.</p>\n  <ol>\n    <li>In <span class=\"code\">setup()</span>: start Serial at 9600 and make pin 13 an <span class=\"code\">OUTPUT</span>.</li>\n    <li>For <b>each digit</b>, in order:\n      <ol>\n        <li><span class=\"code\">Serial.println</span> the digit.</li>\n        <li>Blink pin 13 that many times. One blink = <b>HIGH</b>, wait <b>200 ms</b>, <b>LOW</b>, wait <b>200 ms</b>.</li>\n        <li>After the last blink, wait an extra <b>1000 ms</b> before the next digit (a separate <span class=\"code\">delay(1000)</span>).</li>\n      </ol>\n    </li>\n  </ol>\n  <p>That's it. Run and Grade. If the signal is correct... you'll know.</p>\n\n  <h2>Hints</h2>\n  <ol class=\"hints\">\n    <li>Writing the blink code 14 times works, but a function like <span class=\"code\">void blinkDigit(int count)</span> with a <span class=\"code\">for</span> loop inside is much shorter.</li>\n    <li>Then <span class=\"code\">loop()</span> is only four lines.</li>\n    <li>When it's correct, keep an eye on the <b>Output</b> tab.</li>\n  </ol>\n</body>\n</html>\n"
+}
