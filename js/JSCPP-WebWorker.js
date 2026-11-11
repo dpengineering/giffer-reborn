@@ -3,8 +3,40 @@ importScripts("ArduinoClasses.js");
 
 var breakpoints = [];
 var frameManager;
+var boardType = null; // set from the "code" message; pin checks only apply to the LED Board
+
+// The LED Board is an Arduino Uno with LEDs on pins 2-15.
+// Uno pinout: digital 0-13, analog A0-A5 = 14-19. Pins 0/1 are Serial (USB) RX/TX.
+var UNO_ANALOG_NAMES = {14: "A0", 15: "A1", 16: "A2", 17: "A3", 18: "A4", 19: "A5"};
+function checkOutputPin(rt, pin, what) {
+  if (boardType !== "LED Board") { return true; }
+  var label = UNO_ANALOG_NAMES[pin] ? pin + " (" + UNO_ANALOG_NAMES[pin] + ")" : String(pin);
+  if (pin < 0 || pin > 19) {
+    rt.raiseException("Arduino Uno pin error: pin " + pin + " doesn't exist on the Arduino Uno (" + what + ").");
+    return false;
+  }
+  if (pin === 0 || pin === 1) {
+    rt.raiseException("Arduino Uno pin error: pin " + pin + " is reserved for Serial (USB) on the Arduino Uno (" + what + ").");
+    return false;
+  }
+  if (pin > 15) {
+    rt.raiseException("Arduino Uno pin error: pin " + label + " has no LED on this board (" + what + ").");
+    return false;
+  }
+  return true;
+}
+function checkExistingPin(rt, pin, what) {
+  if (boardType === "LED Board" && (pin < 0 || pin > 19)) {
+    rt.raiseException("Arduino Uno pin error: pin " + pin + " doesn't exist on the Arduino Uno (" + what + ").");
+    return false;
+  }
+  return true;
+}
 
 function pinMode(rt, pin, mode) {
+  if (mode === OUTPUT ? !checkOutputPin(rt, pin, "pinMode OUTPUT") : !checkExistingPin(rt, pin, "pinMode")) {
+    return;
+  }
   if (mode > 2) {
     rt.raiseException("Unknown mode " + mode.toString());
     return;
@@ -12,6 +44,7 @@ function pinMode(rt, pin, mode) {
   frameManager.setPinMode(pin, mode);
 }
 function digitalWrite(rt, pin, state) {
+  if (!checkOutputPin(rt, pin, "digitalWrite")) { return; }
   if (frameManager.getPinMode(pin) !== OUTPUT) {
     rt.raiseException("Attempted to write to an input pin in digitalWrite.");
     return;
@@ -30,6 +63,7 @@ function digitalWrite(rt, pin, state) {
   progress(rt, 0);
 }
 function analogWrite(rt, pin, value) {
+  if (!checkOutputPin(rt, pin, "analogWrite")) { return; }
   if (frameManager.getPinMode(pin) !== OUTPUT) {
     rt.raiseException("Attempted to write to an input pin in analogWrite.");
     return;
@@ -643,6 +677,7 @@ function messageHandler(event) {
     var code = event.data.code;
     setPinKeyframes(event.data.pinKeyframes);
     var debugging = event.data.debugging;
+    boardType = event.data.boardType || null;
     var config = {
       includes: {
         "Arduino.h": arduino_h, //defined above

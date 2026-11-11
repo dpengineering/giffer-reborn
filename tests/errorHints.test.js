@@ -18,7 +18,7 @@ function rawError(code) {
   vm.createContext(ctx);
   ctx.importScripts("JSCPP-WebWorker.js");
   try {
-    handler({ data: { type: "code", code: prefix + code + suffix, pinKeyframes: [], debugging: false } });
+    handler({ data: { type: "code", code: prefix + code + suffix, pinKeyframes: [], debugging: false, boardType: "LED Board" } });
     return null;
   } catch (e) { return String(e); }
 }
@@ -41,11 +41,20 @@ const cases = [
   ["bad type", S("  Int x = 5;"), 3, "Int", "Unknown type"],
   ["input pin", S("  pinMode(12, INPUT);\n  digitalWrite(12, HIGH);"), 4, "digitalWrite", "OUTPUT"],
   ["not a left value", S("  5 = 3;"), 3, "5", "left side of ="],
+  ["LED off-by-one", "void setup() {\n  for (int led = 2; led <= 16; led++) {\n    pinMode(led, OUTPUT);\n  }\n}\nvoid loop() {\n}\n", 3, "pinMode", "Pin 16 (A2) has no LED"],
+  ["write to pin 20", S("  digitalWrite(20, HIGH);"), 3, "digitalWrite", "doesn't exist on the Arduino Uno"],
+  ["Serial pin", "void setup() {\n  pinMode(1, OUTPUT);\n}\nvoid loop() {\n}\n", 2, "pinMode", "reserved for Serial"],
+  ["input pin 18 is fine", S("  pinMode(18, INPUT);\n  int v = digitalRead(18);"), null, null, null],
 ];
 
 let failed = 0;
 for (const [name, code, line, text, title] of cases) {
   const raw = rawError(code);
+  if (line === null) {  // expect the program to run without errors
+    if (raw) { failed++; }
+    console.log((raw ? "FAIL " : "PASS ") + name + (raw ? "\n     raw: " + raw : ""));
+    continue;
+  }
   const r = raw && GifferErrors.explain(raw, code, 3);
   const got = r && r.row !== null ? code.split("\n")[r.row].slice(r.startCol, r.endCol) : null;
   const ok = r && r.row + 1 === line && got === text && r.title.includes(title);

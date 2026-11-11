@@ -625,7 +625,7 @@ function runCode(callback) {
   currentBoard.updateInputs();
 
   debug.sendUpdatedBreakpoints();
-  jscpp.postMessage({ type: "code", code: code, pinKeyframes: currentBoard.pinKeyframes, debugging: debug.isEnabled() });
+  jscpp.postMessage({ type: "code", code: code, pinKeyframes: currentBoard.pinKeyframes, debugging: debug.isEnabled(), boardType: currentBoard.type });
 }
 
 
@@ -701,63 +701,23 @@ function overwriteCode(includeComments = false) {
 
 // Basic C/C++ formatter: adjusts indentation for braces and preserves comments/preprocessor lines.
 function formatCode() {
+  // Indentation rules live in js/formatter.js (Arduino Ctrl+T style).
   var code = editor.getValue();
-  var lines = code.split(/\r?\n/);
-  var indentLevel = 0;
-  var indentStr = '  '; // two spaces
-  var inBlockComment = false;
-  var out = [];
+  var formatted = GifferFormat.format(code);
+  if (formatted === code) { editor.focus(); return; }
 
-  for (var i = 0; i < lines.length; i++) {
-    var raw = lines[i];
-    var trimmed = raw.trim();
-
-    if (trimmed.length === 0) {
-      out.push('');
-      continue;
-    }
-
-    // Preserve preprocessor directives at column 0
-    if (trimmed.startsWith('#')) {
-      out.push(trimmed);
-      continue;
-    }
-
-    // Handle block comments
-    if (inBlockComment) {
-      out.push(indentStr.repeat(indentLevel) + trimmed);
-      if (trimmed.includes('*/')) inBlockComment = false;
-      continue;
-    }
-    if (trimmed.startsWith('/*')) {
-      out.push(indentStr.repeat(indentLevel) + trimmed);
-      if (!trimmed.includes('*/')) inBlockComment = true;
-      continue;
-    }
-
-    // If line starts with a closing brace, dedent first
-    if (/^}/.test(trimmed)) {
-      indentLevel = Math.max(0, indentLevel - 1);
-    }
-
-    var currentIndent = indentStr.repeat(indentLevel);
-    out.push(currentIndent + trimmed);
-
-    // Update indent level by counting braces on the line
-    var opens = (trimmed.match(/{/g) || []).length;
-    var closes = (trimmed.match(/}/g) || []).length;
-    indentLevel += opens - closes;
-    if (indentLevel < 0) indentLevel = 0;
-  }
-
-  var formatted = out.join('\n');
-
-  // Preserve cursor position as best-effort
+  // Keep the cursor on the same code character: shift it by how much that line's indent changed.
   var cursor = editor.getCursorPosition();
-  editor.session.setValue(formatted);
-  try { editor.resize(); } catch (e) {}
+  var oldLine = editor.session.getLine(cursor.row);
+  var oldIndent = oldLine.length - oldLine.replace(/^\s+/, "").length;
+
+  // doc.setValue (unlike session.setValue) keeps undo history, so Ctrl+Z undoes a format.
+  editor.session.getDocument().setValue(formatted);
+
   var row = Math.min(cursor.row, editor.session.getLength() - 1);
-  var column = Math.min(cursor.column, editor.session.getLine(row).length);
+  var newLine = editor.session.getLine(row);
+  var newIndent = newLine.length - newLine.replace(/^\s+/, "").length;
+  var column = Math.max(newIndent, Math.min(cursor.column - oldIndent + newIndent, newLine.length));
   editor.moveCursorTo(row, column);
   editor.clearSelection();
   editor.focus();

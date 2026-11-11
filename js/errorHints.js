@@ -307,6 +307,15 @@ var GifferErrors = (function () {
       var t = suggest(m[1], KNOWN_TYPES);
       result.title = "Unknown type \"" + m[1] + "\"";
       result.hint = t ? "Did you mean " + t + "? Types are lowercase in C++." : "Check the spelling of the type.";
+    } else if ((m = /^Arduino Uno pin error: (.*) \((.+)\)\.$/.exec(msg))) {
+      result.title = m[1].charAt(0).toUpperCase() + m[1].slice(1);
+      // Narrow the highlight to the call that used the bad pin.
+      var call = m[2].split(" ")[0];
+      var at = (lines[row] || "").indexOf(call);
+      if (at !== -1) { result.startCol = at; result.endCol = at + call.length; }
+      result.hint = "This board is an Arduino Uno. Its LEDs are on pins 2-15. " +
+                    "The Uno has digital pins 0-13 and analog pins A0-A5 (14-19); pins 0 and 1 are used by Serial. " +
+                    "Check the pin number, or the variable that holds it.";
     } else if (/Attempted to write to an input pin/.test(msg)) {
       result.title = "Writing to a pin that isn't set as OUTPUT";
       result.hint = "Call pinMode(pin, OUTPUT); in setup() before using digitalWrite or analogWrite on that pin.";
