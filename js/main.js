@@ -43,39 +43,15 @@ var editor = ace.edit("editor");
 // The following line sets the programming language mode to C++.
 editor.getSession().setMode("ace/mode/c_cpp");
 
-// default cosmetic values and settings
-// these three variables are three visual settings for ace
-var themeValue;
-var fontSize;
-var wrapping;
-
-// here, we apply default values, 
-// or values from the client if they've set particular values for the above
-if (!getFromStorage("themeValue")) {
-  
-  themeValue = 'chrome';
-  fontSize = 14;
-  wrapping = true;
-
-} else {
-
-  themeValue = getFromStorage("themeValue");
-  fontSize = getFromStorage("font-size");
-  wrapping = (getFromStorage("wrapping-check") === 'true');
-}
-
-// highlights active lines and sets theme
+// Look of the editor: theme, colors, font... (js/themeCustomizer.js, Tools > Customize Theme)
 editor.setOptions({
   highlightActiveLine: true,
-  showPrintMargin: false,
-  theme: `ace/theme/${themeValue}` //change this
-})
-
-// sets the ace font size
-document.getElementById('editor').style.fontSize=`${fontSize}pt`;
-
-// toggles line wrapping
-editor.session.setUseWrapMode(wrapping);
+  showPrintMargin: false
+});
+var editorTheme = ThemeCustomizer.load();
+ThemeCustomizer.apply(editor, editorTheme, "editor");
+// C++ highlighting plus Arduino words (pinMode, HIGH, Serial...)
+ThemeCustomizer.arduinoMode(function (mode) { editor.session.setMode(mode); });
 
 // fills in existing code
 editor.setValue(getFromStorage("code", defaultCode), -1);
@@ -98,13 +74,187 @@ window.addEventListener('resize', function () { try { editor.resize(); } catch (
 // Recalculate when bootstrap tabs are shown (some content height changes)
 $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function () { try { editor.resize(); } catch (e) {} });
 
-//launches change theme modal 
+// ---- Theme customizer modal ----------------------------------------------------
+// Changes go to a draft shown in the preview editor; Apply copies the draft to the real editor.
+var themeDraft = null;
+var themeDefaults = {};     // the base theme's own colors, for the swatches and the reset buttons
+var previewEditor = null;
+var THEME_SAMPLE = [
+  "// Blink each LED in turn",
+  "#define WAIT 200",
+  "int leds[] = {2, 3, 4};",
+  "",
+  "void setup() {",
+  "  Serial.begin(9600);",
+  "  for (int led : leds) {",
+  "    pinMode(led, OUTPUT);",
+  "  }",
+  "}",
+  "",
+  "void loop() {",
+  "  for (int i = 0; i < 3; i++) {",
+  "    digitalWrite(leds[i], HIGH);",
+  "    delay(WAIT * 2);",
+  "    digitalWrite(leds[i], LOW);",
+  "  }",
+  "  Serial.println(\"Done!\");",
+  "}"
+].join("\n");
+
 function showThemes() {
-  // Reflect the current settings in the modal instead of always showing the defaults.
-  document.getElementById('themes').value = themeValue;
-  document.getElementById('font-size').value = fontSize;
-  document.getElementById('wrapping-check').checked = wrapping;
-  $("#theme-modal").modal('show');
+  themeDraft = ThemeCustomizer.clone(editorTheme);
+  if (!previewEditor) { setupThemeModal(); }
+  document.getElementById("theme-code").value = "";
+  document.getElementById("theme-code-status").textContent = "";
+  syncThemeControls();
+  updateThemePreview();
+  $("#theme-modal").modal("show");
+}
+
+function setupThemeModal() {
+  previewEditor = ace.edit("theme-preview");
+  previewEditor.setOptions({highlightActiveLine: true, showPrintMargin: false});
+  previewEditor.setValue(THEME_SAMPLE, -1);
+  previewEditor.selection.setRange(new (ace.require("ace/range").Range)(13, 17, 13, 24));   // shows the selection color
+  ThemeCustomizer.arduinoMode(function (mode) { previewEditor.session.setMode(mode); });
+  $("#theme-modal").on("shown.bs.modal", function () { previewEditor.resize(true); });
+
+  var fontSelect = document.getElementById("theme-font");
+  ThemeCustomizer.FONTS.forEach(function (f) {
+    var o = document.createElement("option");
+    o.value = f.value;
+    o.textContent = f.label;
+    fontSelect.appendChild(o);
+  });
+
+  var presets = document.getElementById("theme-presets");
+  ThemeCustomizer.PRESETS.forEach(function (p) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn btn-sm btn-outline-primary";
+    b.textContent = p.name;
+    b.onclick = function () {
+      var keep = {font: themeDraft.font, lineHeight: themeDraft.lineHeight, wrap: themeDraft.wrap};
+      themeDraft = ThemeCustomizer.withDefaults(Object.assign(keep, ThemeCustomizer.clone(p.settings)));
+      if (!p.settings.fontSize) { themeDraft.fontSize = editorTheme.fontSize; }
+      syncThemeControls();
+      updateThemePreview();
+    };
+    presets.appendChild(b);
+  });
+
+  function onChange(id, fn) { document.getElementById(id).addEventListener("input", fn); document.getElementById(id).addEventListener("change", fn); }
+  onChange("themes", function () {
+    themeDraft.base = document.getElementById("themes").value;
+    updateThemePreview();
+  });
+  onChange("theme-font", function () { themeDraft.font = fontSelect.value; updateThemePreview(); });
+  onChange("font-size", function () {
+    var v = Number(document.getElementById("font-size").value);
+    if (v >= 6 && v <= 40) { themeDraft.fontSize = v; updateThemePreview(); }
+  });
+  onChange("theme-line-height", function () { themeDraft.lineHeight = document.getElementById("theme-line-height").value; updateThemePreview(); });
+  onChange("wrapping-check", function () { themeDraft.wrap = document.getElementById("wrapping-check").checked; updateThemePreview(); });
+  onChange("theme-italic", function () { themeDraft.italicComments = document.getElementById("theme-italic").checked; updateThemePreview(); });
+  onChange("theme-bold", function () { themeDraft.bold = document.getElementById("theme-bold").checked; updateThemePreview(); });
+
+  document.getElementById("theme-reset").onclick = function () {
+    themeDraft = ThemeCustomizer.withDefaults({});
+    syncThemeControls();
+    updateThemePreview();
+  };
+  document.getElementById("theme-code-copy").onclick = function () {
+    var box = document.getElementById("theme-code");
+    box.value = ThemeCustomizer.exportCode(themeDraft);
+    box.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) {}
+    document.getElementById("theme-code-status").textContent = ok ? "Copied! Send it to a friend; they paste it here and press Load." : "Select the code above and copy it.";
+  };
+  document.getElementById("theme-code-load").onclick = function () {
+    var loaded = ThemeCustomizer.importCode(document.getElementById("theme-code").value);
+    var status = document.getElementById("theme-code-status");
+    if (!loaded) { status.textContent = "That doesn't look like a theme code (they start with GIFFER-THEME:)."; return; }
+    themeDraft = loaded;
+    syncThemeControls();
+    updateThemePreview();
+    status.textContent = "Loaded! Press Apply to keep it.";
+  };
+}
+
+// Put the draft's values into the form.
+function syncThemeControls() {
+  document.getElementById("themes").value = themeDraft.base;
+  document.getElementById("theme-font").value = themeDraft.font;
+  document.getElementById("font-size").value = themeDraft.fontSize;
+  document.getElementById("theme-line-height").value = themeDraft.lineHeight || "";
+  document.getElementById("wrapping-check").checked = !!themeDraft.wrap;
+  document.getElementById("theme-italic").checked = !!themeDraft.italicComments;
+  document.getElementById("theme-bold").checked = !!themeDraft.bold;
+}
+
+function updateThemePreview() {
+  ThemeCustomizer.apply(previewEditor, themeDraft, "theme-preview", function (theme) {
+    themeDefaults = ThemeCustomizer.readThemeColors(theme);
+    renderThemeColors();
+  });
+  renderThemeColors();
+}
+
+// One row per color: swatch (color picker), name, example, and a reset button when changed.
+function renderThemeColors() {
+  var box = document.getElementById("theme-colors");
+  box.innerHTML = "";
+  var group = null;
+  ThemeCustomizer.COLORS.forEach(function (c) {
+    if (c.group !== group) {
+      group = c.group;
+      var h = document.createElement("div");
+      h.className = "theme-color-group";
+      h.textContent = group === "Code" ? "Code colors" : "Editor";
+      box.appendChild(h);
+    }
+    var changed = !!themeDraft.colors[c.key];
+    var value = themeDraft.colors[c.key] || themeDefaults[c.key] || "#000000";
+    var row = document.createElement("label");
+    row.className = "theme-color" + (changed ? " theme-color-changed" : "");
+    var input = document.createElement("input");
+    input.type = "color";
+    input.value = value;
+    input.addEventListener("input", function () {
+      themeDraft.colors[c.key] = input.value;
+      row.classList.add("theme-color-changed");
+      ThemeCustomizer.applyColors(themeDraft, "theme-preview");
+    });
+    input.addEventListener("change", function () { renderThemeColors(); });
+    var name = document.createElement("span");
+    name.className = "theme-color-name";
+    name.textContent = c.label;
+    row.appendChild(input);
+    row.appendChild(name);
+    if (c.sample) {
+      var sample = document.createElement("code");
+      sample.className = "theme-color-sample";
+      sample.textContent = c.sample;
+      sample.style.color = value;
+      sample.style.background = themeDraft.colors.background || themeDefaults.background || "";
+      row.appendChild(sample);
+    }
+    if (changed) {
+      var reset = document.createElement("button");
+      reset.type = "button";
+      reset.className = "theme-color-reset";
+      reset.title = "Use the theme's own color";
+      reset.innerHTML = "&#8634;";
+      reset.onclick = function (e) {
+        e.preventDefault();
+        delete themeDraft.colors[c.key];
+        updateThemePreview();
+      };
+      row.appendChild(reset);
+    }
+    box.appendChild(row);
+  });
 }
 
 // Pops up a random code snippet (from js/quizChunks.js) for class discussion.
@@ -137,24 +287,11 @@ function showRandomChunk() {
   $("#random-chunk-modal").modal('show');
 }
 
-// applies the settings selected in the above modal
+// Apply button: the draft becomes the real editor's theme.
 function applyTheme() {
-  var themeSelector = document.getElementById('themes');
-  themeValue = themeSelector.options[themeSelector.selectedIndex].value;
-  fontSize = document.getElementById('font-size').value;
-  wrapping = document.getElementById('wrapping-check').checked;
-
-  editor.setOptions({
-    theme: `ace/theme/${themeValue}`
-  })
-  document.getElementById('editor').style.fontSize=`${fontSize}pt`;
-  editor.session.setUseWrapMode(wrapping);
-
-  try { editor.resize(); } catch (e) {}
-
-  setToStorage("themeValue", themeValue);
-  setToStorage("font-size", fontSize);
-  setToStorage("wrapping-check", wrapping);
+  editorTheme = ThemeCustomizer.withDefaults(themeDraft);
+  ThemeCustomizer.apply(editor, editorTheme, "editor");
+  ThemeCustomizer.save(editorTheme);
 }
 
 //Debug

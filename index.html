@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giffer Reborn</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-2214">
-  <link rel="stylesheet" href="css/main.css?v=2026.11.11-2214">
-  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-2214">
-  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-2214">
+  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-2245">
+  <link rel="stylesheet" href="css/main.css?v=2026.11.11-2245">
+  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-2245">
+  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-2245">
 </head>
 <body>
 <nav class="navbar sticky-top navbar-light bg-light">
@@ -123,7 +123,7 @@
                     <button class="btn btn-outline-secondary" onclick="generateExerciseModal()">Generate Exercise</button>
                     <hr>
                     <button class="btn btn-info" onclick="showReadme()">Show Help</button>
-                    <button class="btn btn-secondary" onclick="showThemes()">Change Theme</button>
+                    <button class="btn btn-secondary" onclick="showThemes()">Customize Theme</button>
                     <button class="btn btn-secondary" onclick="showRandomChunk()">Random Chunk</button>
                     <hr>
      
@@ -284,23 +284,21 @@
   </div>
 </div>
 
-<div class="modal fade" id="theme-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+<div class="modal fade" id="theme-modal" tabindex="-1" role="dialog" aria-labelledby="theme-modal-title" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="modal-title">Change Theme</h5>
+        <h5 class="modal-title" id="theme-modal-title">Customize Editor Theme</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-        <div class="form-row justify-content-center align-items-center">
-          <div class="col-md-auto">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><strong>Theme</strong></span>
-              </div>
-              <select class="form-control theme-selector" id="themes">
+        <div class="row">
+          <div class="col-lg-5 theme-controls">
+            <div class="theme-section">
+              <div class="theme-section-title">Start from</div>
+              <select class="form-control form-control-sm" id="themes" aria-label="Base theme">
                 <optgroup label="Light">
                   <option value="chrome" selected>Chrome</option>
                   <option value="xcode">XCode</option>
@@ -328,32 +326,56 @@
                   <option value="terminal">Terminal</option>
                 </optgroup>
               </select>
+              <div class="theme-presets" id="theme-presets"><span class="theme-hint">or try:</span></div>
             </div>
-          </div>
-          <div class="col-md-auto">
-            <div class="input-group mb-3 has-warning has-feedback">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><strong>Font Size</strong></span>
+
+            <div class="theme-section">
+              <div class="theme-section-title">Font</div>
+              <div class="theme-font-row">
+                <select class="form-control form-control-sm" id="theme-font" aria-label="Font"></select>
+                <div class="input-group input-group-sm theme-size">
+                  <input type="number" min="6" max="40" class="form-control" id="font-size" aria-label="Font size" value="14">
+                  <div class="input-group-append"><span class="input-group-text">pt</span></div>
+                </div>
+                <select class="form-control form-control-sm theme-spacing" id="theme-line-height" aria-label="Line spacing">
+                  <option value="">Normal spacing</option>
+                  <option value="1.5">Roomy</option>
+                  <option value="1.8">Extra roomy</option>
+                </select>
               </div>
-              <input type="number" required min="1" max="30" class="form-control font-size-input" aria-label="Font Size" id="font-size" value="14"/> 
+              <div class="theme-checks">
+                <label><input type="checkbox" id="wrapping-check" checked> Wrap long lines</label>
+                <label><input type="checkbox" id="theme-italic"> <i>Italic comments</i></label>
+                <label><input type="checkbox" id="theme-bold"> <b>Bold keywords</b></label>
+              </div>
             </div>
-          </div>
-          <div class="col-md-auto">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <span class="input-group-text" id=""><strong>Wrap</strong></span>
-              </div>
-              <div class="input-group-append">
-                <div class="input-group-text">
-                  <input type="checkbox" class="big-checkbox wrapping-checkbox" aria-label="Checkbox for following text input" id="wrapping-check" checked>
+
+            <div class="theme-section">
+              <div class="theme-section-title">Colors <span class="theme-hint">click a swatch to change it; &#8634; puts the theme's color back</span></div>
+              <div id="theme-colors"></div>
+            </div>
+
+            <div class="theme-section">
+              <div class="theme-section-title">Share</div>
+              <div class="input-group input-group-sm">
+                <input type="text" class="form-control" id="theme-code" placeholder="Paste a friend's theme code here" aria-label="Theme code">
+                <div class="input-group-append">
+                  <button class="btn btn-outline-secondary" type="button" id="theme-code-load">Load</button>
+                  <button class="btn btn-outline-secondary" type="button" id="theme-code-copy">Copy mine</button>
                 </div>
               </div>
+              <div class="theme-hint" id="theme-code-status"></div>
             </div>
+          </div>
+          <div class="col-lg-7">
+            <div class="theme-preview-label">Preview <span class="theme-hint">(you can type in it)</span></div>
+            <div id="theme-preview"></div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-danger mr-auto" id="theme-reset">Reset everything</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="applyTheme()">Apply</button>
       </div>
     </div>
@@ -526,23 +548,24 @@ int main() {
 
 <div id="highlight-storage" style="display: none; width: 0.01px; height: 0.01px;"></div>
 
-<script src="js/jquery-2.2.1.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap.bundle.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/ace/ace.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/FrameManager.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/gif/gif.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/FileSaver.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/clipboard.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/highlight.pack.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/errorHints.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/formatter.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/quizChunks.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/Debugger.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/three.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/OrbitControls.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/Board.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/terminal.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
-<script src="js/main.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.2.1.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap.bundle.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ace.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/FrameManager.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/gif/gif.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/FileSaver.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/clipboard.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/highlight.pack.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/errorHints.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/themeCustomizer.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/formatter.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/quizChunks.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/Debugger.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/three.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/OrbitControls.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/Board.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/terminal.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/main.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>
