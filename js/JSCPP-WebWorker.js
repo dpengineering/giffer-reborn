@@ -632,7 +632,8 @@ function setAllInputPinsToTime(frameManager, time){
 }
 
 var cppdebugger = null;
-var lastLine = null;
+// False after the student presses Stop: the run finishes without pausing.
+var debuggingOn = true;
 
 function submitFrameManager() {
   var out = {frameManager: JSON.stringify(frameManager), type: "frameManager"};
@@ -794,6 +795,7 @@ function handleMessage(event) {
     var rewritten = RangeFor.transformWithMap(event.data.code);
     rangeMap = rewritten.changed ? rewritten : null;
     var code = rewritten.code;
+    debuggingOn = true;
     setPinKeyframes(event.data.pinKeyframes);
     var debugging = event.data.debugging;
     boardType = event.data.boardType || null;
@@ -820,13 +822,8 @@ function handleMessage(event) {
       };
       cppdebugger.conditions["breakpoints"] = function (prev, next) {
         if (interp.compositeYield) { return false; }
-        var previous = lastLine;
-        lastLine = next.sLine;
-        if (breakpoints.includes(next.sLine) && previous !== next.sLine) {
-          return true;
-        } else {
-          return false;
-        }
+        // Stop when arriving at a breakpoint line from a different line (not on every piece of it).
+        return breakpoints.includes(next.sLine) && (prev == null || prev.sLine !== next.sLine);
       };
 
       cppdebugger.stopConditions["breakpoints"] = true;
@@ -845,6 +842,8 @@ function handleMessage(event) {
     }
     if (event.data.action === "continue") {
       setLineByLine(false);
+      // Step Line turns breakpoints off for its own step; Continue has to turn them back on.
+      cppdebugger.stopConditions["breakpoints"] = debuggingOn;
       qualifiedContinue();
     }
     else if (event.data.action === "stepLine") {
@@ -856,6 +855,7 @@ function handleMessage(event) {
       qualifiedNext();
     }
     else if (event.data.action === "enabled") {
+      debuggingOn = !!event.data.state;
       if (event.data.state) {
         enableAll();
       } else {

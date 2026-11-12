@@ -88,7 +88,27 @@ function stepTexts(code, action, max) {
   return texts.join(" | ");
 }
 const dbgProgram = "int leds[] = {2, 3};\nvoid setup() {\n  for (int led : leds) {\n    pinMode(led, OUTPUT);\n  }\n}\nvoid loop() {\n}\n";
+// Breakpoint added after Step from Start + Step Line: Continue must stop there (it used to run past).
+function breakpointAfterStepping() {
+  const code = "int n = 0;\nvoid setup() {\n  n = 1;\n  n = 2;\n}\nvoid loop() {\n  n = 3;\n  n = 4;\n}\n";
+  const full = prefix + code + suffix;
+  const ctx = { console };
+  ctx.self = ctx; ctx.global = ctx; ctx.location = { search: "" };
+  const lines = [];
+  ctx.postMessage = m => { const o = JSON.parse(m); if (o.type === "debuginfo") { lines.push(o.node.sLine - 3); } };
+  let handler;
+  ctx.addEventListener = (t, h) => { handler = h; };
+  ctx.importScripts = f => vm.runInContext(fs.readFileSync(path.join(repo, "js", f.split("?")[0]), "utf8"), ctx, { filename: f });
+  vm.createContext(ctx);
+  ctx.importScripts("JSCPP-WebWorker.js");
+  handler({ data: { type: "code", code: full, pinKeyframes: [], debugging: true, stepFromStart: true, boardType: "LED Board" } });
+  handler({ data: { type: "debugger", action: "stepLine" } });
+  handler({ data: { type: "breakpoints", breakpoints: [8 + 3] } });   // n = 4; in loop()
+  handler({ data: { type: "debugger", action: "continue" } });
+  return lines.join(",");
+}
 const dbgCases = [
+  ["Continue stops at a breakpoint added mid-session", breakpointAfterStepping().split(",").pop(), "8"],
   ["Step Line underlines the loop header", stepTexts(dbgProgram, "stepLine", 3), "setup | for (int led : leds) | pinMode"],
   ["Step Expression: one pause per element, then the body", stepTexts(dbgProgram, "stepExpression", 6),
    "setup | int led : leds {led=2} | pinMode | led | OUTPUT | pinMode(led, OUTPUT)"],

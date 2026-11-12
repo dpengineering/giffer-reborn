@@ -42,15 +42,8 @@ function Debugger(editor) {
   this.stepFromStart = false;
   this.steppingActive = false;
   this.isEnabled = function() {
-    var breakpointsOn = document.getElementById("debugging-enabled").checked && this.breakpoints.length !== 0;
+    var breakpointsOn = this.breakpoints.length !== 0;
     return breakpointsOn || this.stepFromStart || this.steppingActive;
-  };
-  this.sendUpdateEnabled = function () {
-    try {
-      jscpp.postMessage({type: "debugger", action: "enabled", state: this.isEnabled()});
-    } catch (e) {
-      console.log(e);
-    }
   };
 
   // "Step from Start": run the code and pause on its very first line, no breakpoint needed.
