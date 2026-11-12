@@ -51,7 +51,7 @@ label.btn {
     border-radius: 10px;
 }
 
-#obtain-secret, #finish-debug {
+#obtain-secret, #debug-toolbar {
     display: none;
 }
 
@@ -184,7 +184,46 @@ div.form-group label {
 .ace_gutter-cell.dbg-gutter-prev::before { color: #43a047; }
 .ace_gutter-cell.dbg-gutter-next::before { color: #e53935; }
 
-#debugging-buttons .btn { margin: 0 4px 6px 0; }
+#debugging-buttons { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.dbg-toolbar-note { font-size: 0.8rem; color: #666; }
+
+/* Debug toolbar in the top bar (VS Code style icons) */
+.dbg-icon { width: 16px; height: 16px; fill: currentColor; vertical-align: -3px; flex: none; }
+.dbg-icon .dbg-icon-stroke { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.dbg-toolbar {
+    align-items: center;
+    gap: 2px;
+    margin-right: 10px;
+    padding: 2px 4px;
+    border: 1px solid #d0d7de;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+.dbg-tb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: #1a73c8;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    cursor: pointer;
+}
+.dbg-tb-btn span { color: #333; }
+.dbg-tb-btn:hover:not(:disabled) { background: #e8eef6; }
+.dbg-tb-btn:focus { outline: none; box-shadow: 0 0 0 2px rgba(26, 115, 200, 0.35); }
+.dbg-tb-btn:disabled { opacity: 0.35; cursor: default; }
+.dbg-tb-continue { color: #2e9e4a; }
+.dbg-tb-restart  { color: #2e9e4a; }
+.dbg-tb-stop     { color: #d93025; }
+.dbg-tb-sep { width: 1px; align-self: stretch; margin: 3px 4px; background: #d0d7de; }
+#step-start-button .dbg-icon { vertical-align: -2px; }
+/* Narrow windows: icons only (the tooltips still name each button) */
+@media (max-width: 1300px) { .dbg-tb-btn span { display: none; } .dbg-tb-btn { padding: 5px 7px; } }
 
 #debug-legend {
     display: flex;
@@ -312,4 +351,3 @@ div.form-group label {
 .dbg-cell .dbg-guess { width: 3em; }
 .dbg-right { color: #2e7d32; font-weight: bold; }
 .dbg-wrong { color: #c62828; font-size: 0.8rem; }
-#debug-step-back:disabled { opacity: 0.4; }

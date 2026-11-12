@@ -178,7 +178,8 @@ exerciseField.onkeyup = function (e) {
 //Buttons
 var runButton = document.getElementById("run-button");
 var copyPage = document.getElementById("obtain-secret");
-var finishDebug = document.getElementById("finish-debug");
+var debugToolbar = document.getElementById("debug-toolbar");
+var stepStartButton = document.getElementById("step-start-button");
 var downloadGifButton = document.getElementById("download-gif-button");
 var downloadGifControls = document.getElementById("download-gif-controls");
 var animationOnlyWrapper = document.getElementById("animation-only-wrapper");
@@ -537,7 +538,9 @@ function setButtons(runText, runEnabled, copyVisible, finishVisible) {
   runButton.innerHTML = runText;
   runButton.disabled = !runEnabled;
   copyPage.style.display = copyVisible ? "block" : "none";
-  finishDebug.style.display = finishVisible ? "block" : "none";
+  // While debugging, the step controls live in the top bar (the board stays visible in its tab).
+  debugToolbar.style.display = finishVisible ? "flex" : "none";
+  stepStartButton.style.display = runEnabled ? "" : "none";
 }
 
 //Run

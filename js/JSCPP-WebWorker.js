@@ -694,8 +694,46 @@ function describeLastEval() {
     else { value = String(rt.makeValueString(e.value)); }
   } catch (err) { value = "?"; }
   if (value === "<function>") { return null; }
-  var n = e.node;
-  return {sLine: n.sLine, sColumn: n.sColumn, eLine: n.eLine, eColumn: n.eColumn, type: n.type, value: value};
+  var n = remapNode(e.node);
+  var out = {sLine: n.sLine, sColumn: n.sColumn, eLine: n.eLine, eColumn: n.eColumn, type: n.type, value: value,
+             synthetic: n.synthetic || false};
+  if (n.synthetic === "decl") { out.label = n.label; }   // range-based for: "led -> 3"
+  return out;
+}
+
+// Range-based for loops are rewritten before running (js/rangeFor.js), which makes those lines
+// longer. rangeMap translates interpreter positions back to the student's code.
+var rangeMap = null;
+function remapNode(n) {
+  if (!rangeMap || !n || typeof n.sLine !== "number" || n.sLine < 1) { return n; }
+  var m = rangeMap.map(n.sLine, n.sColumn, n.eLine, n.eColumn);
+  if (!m) { return n; }
+  m.type = n.type;
+  return m;
+}
+function isSyntheticPause() {
+  if (!rangeMap || cppdebugger.done) { return false; }
+  var n = remapNode(cppdebugger.nextNode());
+  if (!n.synthetic) { return false; }
+  // Keep one pause per pass of a range-based for: right after the next element was read
+  // (for (int led : leds) underlined, "led -> 3" in the trail).
+  var interp = cppdebugger.rt.interp;
+  var keep = n.synthetic === "decl" && interp.compositeYield &&
+    interp.currentNode.type === "PostfixExpression_ArrayAccess";
+  return !keep;
+}
+// "12:40 message" from the interpreter -> the matching column in the student's code.
+function remapError(e) {
+  if (!rangeMap) { return e; }
+  function fix(text) {
+    return String(text).replace(/^(\d+):(\d+)/, function (all, line, col) {
+      var m = rangeMap.map(Number(line), Number(col), Number(line), Number(col) + 1);
+      return m ? m.sLine + ":" + m.sColumn : all;
+    });
+  }
+  if (typeof e === "string") { return fix(e); }
+  if (e && typeof e.message === "string") { try { e.message = fix(e.message); } catch (err) {} }
+  return e;
 }
 
 function submitDebuggerState() {
@@ -703,7 +741,7 @@ function submitDebuggerState() {
   this.postMessage(JSON.stringify({type: "debuginfo",
     variables: cppdebugger.variable(),
     frames: collectFrames(),
-    node: cppdebugger.nextNode(),
+    node: remapNode(cppdebugger.nextNode()),
     // The node that ran just before this pause -> the "just executed" line.
     prevLine: prev && typeof prev.sLine === "number" ? prev.sLine : null,
     // What was just computed at this pause (for Step Expression), e.g. arr[i] -> 2.
@@ -720,7 +758,10 @@ function qualifiedContinue() {
 }
 
 function qualifiedNext() {
-  if (cppdebugger.next() === false) {
+  var result = cppdebugger.next();
+  // Skip the generated pieces of a range-based for loop (the hidden __rf index counting up).
+  while (result === false && isSyntheticPause()) { result = cppdebugger.next(); }
+  if (result === false) {
     submitDebuggerState();
   } else {
     submitFrameManager();
@@ -741,8 +782,18 @@ function enableAll() {
 }
 
 function messageHandler(event) {
+  try {
+    handleMessage(event);
+  } catch (e) {
+    throw remapError(e);
+  }
+}
+
+function handleMessage(event) {
   if (event.data.type === "code") {
-    var code = RangeFor.transform(event.data.code);
+    var rewritten = RangeFor.transformWithMap(event.data.code);
+    rangeMap = rewritten.changed ? rewritten : null;
+    var code = rewritten.code;
     setPinKeyframes(event.data.pinKeyframes);
     var debugging = event.data.debugging;
     boardType = event.data.boardType || null;

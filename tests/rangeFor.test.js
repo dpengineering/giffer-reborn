@@ -63,5 +63,41 @@ const errLineOk = err.startsWith("ERR 8:5 ");   // y = 1 is line 5 of the studen
 if (!sameLines || !errLineOk) { failed++; }
 console.log((sameLines && errLineOk ? "PASS " : "FAIL ") + "line numbers preserved" + (errLineOk ? "" : " (" + err + ")"));
 
+// Debugger positions must point at the student's code, not the longer rewritten line.
+function stepTexts(code, action, max) {
+  const full = prefix + code + suffix, lines = full.split("\n");
+  const ctx = { console };
+  ctx.self = ctx; ctx.global = ctx; ctx.location = { search: "" };
+  const msgs = [];
+  ctx.postMessage = m => { const o = JSON.parse(m); if (o.type === "debuginfo") { msgs.push(o); } };
+  let handler;
+  ctx.addEventListener = (t, h) => { handler = h; };
+  ctx.importScripts = f => vm.runInContext(fs.readFileSync(path.join(repo, "js", f.split("?")[0]), "utf8"), ctx, { filename: f });
+  vm.createContext(ctx);
+  ctx.importScripts("JSCPP-WebWorker.js");
+  handler({ data: { type: "code", code: full, pinKeyframes: [], debugging: true, stepFromStart: true, boardType: "LED Board" } });
+  const texts = [];
+  while (texts.length < max) {
+    const o = msgs[msgs.length - 1], n = o.node;
+    texts.push((lines[n.sLine - 1] || "").slice(n.sColumn - 1, n.eColumn - 1).trim() +
+      (o.evaluated && o.evaluated.label ? " {" + o.evaluated.label + "=" + o.evaluated.value + "}" : ""));
+    const before = msgs.length;
+    handler({ data: { type: "debugger", action } });
+    if (msgs.length === before) { break; }
+  }
+  return texts.join(" | ");
+}
+const dbgProgram = "int leds[] = {2, 3};\nvoid setup() {\n  for (int led : leds) {\n    pinMode(led, OUTPUT);\n  }\n}\nvoid loop() {\n}\n";
+const dbgCases = [
+  ["Step Line underlines the loop header", stepTexts(dbgProgram, "stepLine", 3), "setup | for (int led : leds) | pinMode"],
+  ["Step Expression: one pause per element, then the body", stepTexts(dbgProgram, "stepExpression", 6),
+   "setup | int led : leds {led=2} | pinMode | led | OUTPUT | pinMode(led, OUTPUT)"],
+];
+for (const [name, got, want] of dbgCases) {
+  const ok = got === want;
+  if (!ok) { failed++; }
+  console.log((ok ? "PASS " : "FAIL ") + name + (ok ? "" : "\n     got: " + got));
+}
+
 console.log(failed ? failed + " failed" : "all passed");
 process.exit(failed ? 1 : 0);

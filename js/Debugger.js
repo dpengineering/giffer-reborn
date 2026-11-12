@@ -183,9 +183,10 @@ function Debugger(editor) {
     }
     var ev = message.evaluated;
     if (this.lastAction !== "stepExpression" || !ev) { return; }
+    if (ev.synthetic && !ev.label) { return; }   // hidden code from a range-based for loop
     var evRow = JSCPPToAce(ev.sLine);
     if (!this.isLineValid(evRow) || ev.eLine !== ev.sLine) { return; }
-    var text = editor.getSession().getLine(evRow).slice(ev.sColumn - 1, ev.eColumn - 1).trim();
+    var text = ev.label || editor.getSession().getLine(evRow).slice(ev.sColumn - 1, ev.eColumn - 1).trim();
     if (!text || text === ev.value) { return; }   // e.g. a plain number: 13 -> 13 adds nothing
     if (evRow !== this.trail.row) { this.trail = this.trailStack[depth] = {row: evRow, items: []}; }
     this.trail.items.push({text: text, value: ev.value});
@@ -363,6 +364,28 @@ function Debugger(editor) {
       runCode();
     }
   };
+  // Keyboard shortcuts, like VS Code: F5 Continue, F10 Step Line, F11 Step Expression,
+  // Shift+F10 Step Back, Shift+F5 Stop, Ctrl/Cmd+Shift+F5 Restart. F10/F11 also start stepping.
+  this.handleKey = function(e) {
+    if (["F5", "F10", "F11"].indexOf(e.key) === -1) { return; }
+    var toolbar = document.getElementById("debug-toolbar");
+    var debugging = running && toolbar && toolbar.style.display !== "none";
+    var act = null;
+    if (!debugging) {
+      if (!running && (e.key === "F10" || e.key === "F11") && !e.shiftKey) { act = function () { self.startStepping(); }; }
+    } else if (e.key === "F5") {
+      act = (e.ctrlKey || e.metaKey) && e.shiftKey ? function () { self.startStepping(); }
+          : e.shiftKey ? function () { self.stopDebuggingSession(); }
+          : function () { self.doContinue(); };
+    } else if (e.key === "F10") {
+      act = e.shiftKey ? function () { self.stepBack(); } : function () { self.doStepLine(); };
+    } else if (e.key === "F11" && !e.shiftKey) {
+      act = function () { self.doStepExpression(); };
+    }
+    if (act) { e.preventDefault(); e.stopPropagation(); act(); }
+  };
+  document.addEventListener("keydown", function (e) { self.handleKey(e); }, true);
+
   this.doStepLine = function() { this.userAction("stepLine"); };
   this.doStepExpression = function() { this.userAction("stepExpression"); };
   this.userAction = function(kind) {
