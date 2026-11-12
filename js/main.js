@@ -159,6 +159,8 @@ function applyTheme() {
 
 //Debug
 var debug = new Debugger(editor);
+// Remember the "Predict first" checkbox between visits.
+try { document.getElementById("debug-predict").checked = localStorage.getItem("giffer-predict-mode") === "1"; } catch (e) {}
 
 //Fields
 var nameField = document.getElementById("name");
@@ -176,7 +178,8 @@ exerciseField.onkeyup = function (e) {
 //Buttons
 var runButton = document.getElementById("run-button");
 var copyPage = document.getElementById("obtain-secret");
-var finishDebug = document.getElementById("finish-debug");
+var debugToolbar = document.getElementById("debug-toolbar");
+var stepStartButton = document.getElementById("step-start-button");
 var downloadGifButton = document.getElementById("download-gif-button");
 var downloadGifControls = document.getElementById("download-gif-controls");
 var animationOnlyWrapper = document.getElementById("animation-only-wrapper");
@@ -535,7 +538,9 @@ function setButtons(runText, runEnabled, copyVisible, finishVisible) {
   runButton.innerHTML = runText;
   runButton.disabled = !runEnabled;
   copyPage.style.display = copyVisible ? "block" : "none";
-  finishDebug.style.display = finishVisible ? "block" : "none";
+  // While debugging, the step controls live in the top bar (the board stays visible in its tab).
+  debugToolbar.style.display = finishVisible ? "flex" : "none";
+  stepStartButton.style.display = runEnabled ? "" : "none";
 }
 
 //Run
@@ -636,7 +641,9 @@ function runCode(callback) {
   currentBoard.updateInputs();
 
   debug.sendUpdatedBreakpoints();
-  jscpp.postMessage({ type: "code", code: code, pinKeyframes: currentBoard.pinKeyframes, debugging: debug.isEnabled(), boardType: currentBoard.type });
+  var stepFromStart = debug.consumeStepFromStart();
+  debug.resetView();
+  jscpp.postMessage({ type: "code", code: code, pinKeyframes: currentBoard.pinKeyframes, debugging: debug.isEnabled() || stepFromStart, stepFromStart: stepFromStart, boardType: currentBoard.type });
 }
 
 

@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giffer Reborn</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.10-2232">
-  <link rel="stylesheet" href="css/main.css?v=2026.11.10-2232">
-  <link rel="stylesheet" href="css/terminal.css?v=2026.11.10-2232">
-  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.10-2232">
+  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-2214">
+  <link rel="stylesheet" href="css/main.css?v=2026.11.11-2214">
+  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-2214">
+  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-2214">
 </head>
 <body>
 <nav class="navbar sticky-top navbar-light bg-light">
@@ -15,7 +15,24 @@
   <form class="form-inline my-2 my-lg-0">
     <button class="btn btn-outline-secondary mr-2" id="format-button" type="button" onclick="formatCode()" title="Auto Format (Ctrl-Shift-F)">Format</button>
     <button class="btn btn-outline-info my-2 my-sm-0" id="obtain-secret" type="button">Obtain Secret</button>
-    <button class="btn btn-danger my-2 my-sm-0" id='finish-debug' type="button" onclick="debug.stopDebuggingSession()">Finish</button>
+    <!-- Debug toolbar: shown while a debugging session is running (see setButtons in main.js) -->
+    <div id="debug-toolbar" class="dbg-toolbar" role="toolbar" aria-label="Debugger controls">
+      <button type="button" class="dbg-tb-btn dbg-tb-continue" onclick="debug.doContinue()" title="Continue: run to the next breakpoint (F5)">
+        <svg class="dbg-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="3" width="2" height="10" rx=".5"/><path d="M6.5 3.2v9.6a.5.5 0 0 0 .77.42l7.2-4.8a.5.5 0 0 0 0-.84l-7.2-4.8a.5.5 0 0 0-.77.42z"/></svg><span>Continue</span></button>
+      <button type="button" class="dbg-tb-btn dbg-tb-step" onclick="debug.doStepLine()" title="Step Line: run the next line, then pause (F10)">
+        <svg class="dbg-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="dbg-icon-stroke" d="M2.5 9.5a5.5 5.5 0 0 1 10.4-2.6"/><path d="M14.6 3.6l-.3 4.9-4.6-1.7z"/><circle cx="8" cy="13" r="1.8"/></svg><span>Step Line</span></button>
+      <button type="button" class="dbg-tb-btn dbg-tb-step" onclick="debug.doStepExpression()" title="Step Expression: run one small piece of the line, then pause (F11)">
+        <svg class="dbg-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="dbg-icon-stroke" d="M8 1.5v6"/><path d="M4.8 6.2h6.4L8 9.8z"/><circle cx="8" cy="13" r="1.8"/></svg><span>Step Expression</span></button>
+      <button type="button" class="dbg-tb-btn dbg-tb-step" id="debug-step-back" onclick="debug.stepBack()" title="Step Back: go back one step (Shift+F10)" disabled>
+        <svg class="dbg-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="dbg-icon-stroke" d="M13.5 9.5a5.5 5.5 0 0 0-10.4-2.6"/><path d="M1.4 3.6l.3 4.9 4.6-1.7z"/><circle cx="8" cy="13" r="1.8"/></svg><span>Step Back</span></button>
+      <span class="dbg-tb-sep"></span>
+      <button type="button" class="dbg-tb-btn dbg-tb-restart" onclick="debug.startStepping()" title="Restart: run again from the first line (Ctrl+Shift+F5)">
+        <svg class="dbg-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="dbg-icon-stroke" d="M13 8a5 5 0 1 1-1.6-3.7"/><path d="M13.8 1.8v4.4H9.4z"/></svg><span>Restart</span></button>
+      <button type="button" class="dbg-tb-btn dbg-tb-stop" id="finish-debug" onclick="debug.stopDebuggingSession()" title="Stop debugging: finish the run without pausing (Shift+F5)">
+        <svg class="dbg-icon" viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="1.5"/></svg><span>Stop</span></button>
+    </div>
+    <button class="btn btn-outline-success mr-2" id="step-start-button" type="button" onclick="debug.startStepping()" title="Run your code and pause on the very first line (F10)">
+      <svg class="dbg-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="dbg-icon-stroke" d="M2.5 9.5a5.5 5.5 0 0 1 10.4-2.6"/><path d="M14.6 3.6l-.3 4.9-4.6-1.7z"/><circle cx="8" cy="13" r="1.8"/></svg> Step from Start</button>
     <button class="btn btn-success my-2 my-sm-0" id="run-button" type="button" onclick="runCode()">Run</button>
   </form>
 </nav>
@@ -82,31 +99,22 @@
                     <!--Populated/deleted by current board-->
                   </div>
                   <div class="tab-pane fade" id="debug" role="tabpanel" aria-labelledby="edit-tab">
-                    <div class="custom-control custom-checkbox">
-                      <input class="custom-control-input" type="checkbox" id="debugging-enabled" onchange="debug.sendUpdateEnabled()" checked>
-                      <label class="custom-control-label" for="debugging-enabled">Enable breakpoints</label>
-                    </div>
-                    <br>
                     <div id="debugging-buttons">
-                      <button class="btn btn-info" onclick="debug.doContinue()">Run to Next</button>
-                      <button class="btn btn-secondary" onclick="debug.doStepLine()">Step Line</button>
-                      <button class="btn btn-secondary" onclick="debug.doStepExpression()">Step Expression</button>
+                      <span class="dbg-toolbar-note">Press <strong>Step from Start</strong> in the top bar to begin. The step buttons appear there while you debug, so the board stays in view. Keys: F10 Step Line, F11 Step Expression, F5 Continue.</span>
                     </div>
-                    <br>
-                    <br>
-                    <div id="variables-table">
-                      <table class="table">
-                        <thead>
-                        <tr>
-                          <th scope="col">Type</th>
-                          <th scope="col">Variable</th>
-                          <th scope="col">Value</th>
-                        </tr>
-                        </thead>
-                        <tbody id="variables-table-body">
-
-                        </tbody>
-                      </table>
+                    <div class="custom-control custom-checkbox">
+                      <input class="custom-control-input" type="checkbox" id="debug-predict" onchange="debug.togglePredict()">
+                      <label class="custom-control-label" for="debug-predict">&#128302; Predict first: hide new values until I guess them</label>
+                    </div>
+                    <div id="debug-legend">
+                      <span><span class="dbg-arrow dbg-arrow-prev">&#10140;</span> line that just ran</span>
+                      <span><span class="dbg-arrow dbg-arrow-next">&#10140;</span> next line to run</span>
+                      <span id="debug-step-count"></span>
+                    </div>
+                    <div id="debug-predict-banner" class="dbg-predict-banner" style="display: none;"></div>
+                    <div id="debug-trail" style="display: none;"></div>
+                    <div id="debug-frames">
+                      <p class="dbg-empty">Press <strong>Step from Start</strong> in the top bar, or click a line number to set a breakpoint and press Run. Your variables will show up here while the code is paused.</p>
                     </div>
                   </div>
                   <div class="tab-pane fade" id="dev" role="tabpanel" aria-labelledby="dev-tab">
@@ -239,13 +247,13 @@
         To see what your code is expected to do, click the green "Run & Grade" button at the top.<br>
         <br><br>
         <h4>Debugging</h4>
-        Under the "Debugging" tab, there is a checkbox to "Enable Breakpoints".<br>
-        If you click next to a line number on the left of your code, you can add a breakpoint.<br>
-        When breakpoints are enabled, the program will halt execution when it reaches the breakpoint.<br>
-        Once the program has halted, you can view the current variables and their values.<br>
-        You can press "Step" to step to the next line of execution, this might take you into a function.<br>
-        You can press "Continue" to skip to the next breakpoint.<br>
-        At any time during debugging, you can disable breakpoints to finish executing.<br>
+        Press <strong>Step from Start</strong> (top bar) to pause on the first line of your code. While you debug, the step buttons sit in the top bar so the board stays in view.<br>
+        <strong>Step Line</strong> (F10) runs your code one line at a time.<br>
+        A <span style="color:#43a047;font-weight:bold">green arrow</span> marks the line that just ran, and a <span style="color:#e53935;font-weight:bold">red arrow</span> marks the next line to run.<br>
+        Each function call gets its own box of variables. Values that just changed light up yellow.<br>
+        Click next to a line number to add a breakpoint, then <strong>Continue</strong> (F5) skips ahead to it. <strong>Stop</strong> (Shift+F5) finishes the run without pausing.<br>
+        <strong>Step Expression</strong> (F11) runs one piece of a line at a time and lists each value it computes, like <code>arr[i] &rarr; 2</code>.<br>
+        <strong>Step Back</strong> (Shift+F10) goes back one step. Turn on <strong>Predict first</strong> to guess each new value before it's shown.<br>
         <br><br>
         <h4>Submitting</h4>
         Once you've solved an exercise, save your code in the Google Doc provided by your teacher.<br>
@@ -518,23 +526,23 @@ int main() {
 
 <div id="highlight-storage" style="display: none; width: 0.01px; height: 0.01px;"></div>
 
-<script src="js/jquery-2.2.1.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap.bundle.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/ace/ace.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/FrameManager.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/gif/gif.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/FileSaver.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/clipboard.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/highlight.pack.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/errorHints.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/formatter.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/quizChunks.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/Debugger.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/three.min.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/OrbitControls.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/Board.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/terminal.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
-<script src="js/main.js?v=2026.11.10-2232" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.2.1.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap.bundle.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ace.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/FrameManager.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/gif/gif.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/FileSaver.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/clipboard.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/highlight.pack.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/errorHints.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/formatter.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/quizChunks.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/Debugger.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/three.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/OrbitControls.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/Board.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/terminal.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/main.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>

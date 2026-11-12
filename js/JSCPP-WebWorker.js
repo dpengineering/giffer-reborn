@@ -1,6 +1,8 @@
 // self.location.search is the ?v= version main.js started this worker with (cache-busting).
 importScripts("FrameManager.js" + self.location.search);
 importScripts("ArduinoClasses.js" + self.location.search);
+importScripts("errorHints.js" + self.location.search);  // stripCode, used by rangeFor.js
+importScripts("rangeFor.js" + self.location.search);    // rewrites range-based for loops
 
 var breakpoints = [];
 var frameManager;
@@ -630,17 +632,121 @@ function setAllInputPinsToTime(frameManager, time){
 }
 
 var cppdebugger = null;
-var lastLine = null;
+// False after the student presses Stop: the run finishes without pausing.
+var debuggingOn = true;
 
 function submitFrameManager() {
   var out = {frameManager: JSON.stringify(frameManager), type: "frameManager"};
   this.postMessage(JSON.stringify(out));
 }
 
+// Variables grouped into stack frames, Python Tutor style:
+//   [{name: "Global", vars: [...]}, {name: "loop", vars: [...]}, {name: "blinkDigit", vars: [...]}]
+// JSCPP pushes one scope per function call ("function NAME") plus unnamed scopes for blocks
+// (if/for bodies); block scopes are folded into the function frame they belong to.
+function collectFrames() {
+  var rt = cppdebugger.rt;
+  var frames = [];
+  rt.scope.forEach(function (scope) {
+    var scopeName = scope["$name"];
+    if (scopeName === "global") {
+      frames.push({name: "Global", vars: []});
+    } else if (typeof scopeName === "string" && scopeName.indexOf("function ") === 0) {
+      frames.push({name: scopeName.slice("function ".length), vars: []});
+    } else if (!frames.length) {
+      frames.push({name: "Global", vars: []});
+    }
+    var frame = frames[frames.length - 1];
+    for (var name in scope) {
+      var val = scope[name];
+      if (name === "$name" || typeof val !== "object" || val === null || !("t" in val) || !("v" in val)) {
+        continue;
+      }
+      var entry = {name: name, type: "", value: ""};
+      try {
+        entry.type = rt.makeTypeString(val.t);
+        if (rt.isFunctionType && rt.isFunctionType(val.t)) { continue; }
+        if (rt.isPointerType(val.t) && rt.isArrayType(val.t) && !rt.isTypeEqualTo(val.t.eleType, rt.charTypeLiteral)) {
+          entry.elems = val.v.target.slice(val.v.position).map(function (e) {
+            return String(rt.makeValueString(e, {noArray: true}));
+          });
+        } else {
+          entry.value = String(rt.makeValueString(val));
+        }
+      } catch (e) {
+        entry.value = "?";
+      }
+      if (entry.value === "<function>") { continue; }
+      frame.vars.push(entry);
+    }
+  });
+  return frames;
+}
+
+function describeLastEval() {
+  var interp = cppdebugger.rt.interp, rt = cppdebugger.rt;
+  var e = interp.lastEval;
+  if (!e || e.node !== interp.currentNode) { return null; }
+  var value;
+  try {
+    if (e.value === undefined || e.value === null || !e.value.t) { value = "done"; }
+    else if (rt.isFunctionType && rt.isFunctionType(e.value.t)) { return null; }
+    else if (e.value.t.name === "void") { value = "done"; }
+    else { value = String(rt.makeValueString(e.value)); }
+  } catch (err) { value = "?"; }
+  if (value === "<function>") { return null; }
+  var n = remapNode(e.node);
+  var out = {sLine: n.sLine, sColumn: n.sColumn, eLine: n.eLine, eColumn: n.eColumn, type: n.type, value: value,
+             synthetic: n.synthetic || false};
+  if (n.synthetic === "decl") { out.label = n.label; }   // range-based for: "led -> 3"
+  return out;
+}
+
+// Range-based for loops are rewritten before running (js/rangeFor.js), which makes those lines
+// longer. rangeMap translates interpreter positions back to the student's code.
+var rangeMap = null;
+function remapNode(n) {
+  if (!rangeMap || !n || typeof n.sLine !== "number" || n.sLine < 1) { return n; }
+  var m = rangeMap.map(n.sLine, n.sColumn, n.eLine, n.eColumn);
+  if (!m) { return n; }
+  m.type = n.type;
+  return m;
+}
+function isSyntheticPause() {
+  if (!rangeMap || cppdebugger.done) { return false; }
+  var n = remapNode(cppdebugger.nextNode());
+  if (!n.synthetic) { return false; }
+  // Keep one pause per pass of a range-based for: right after the next element was read
+  // (for (int led : leds) underlined, "led -> 3" in the trail).
+  var interp = cppdebugger.rt.interp;
+  var keep = n.synthetic === "decl" && interp.compositeYield &&
+    interp.currentNode.type === "PostfixExpression_ArrayAccess";
+  return !keep;
+}
+// "12:40 message" from the interpreter -> the matching column in the student's code.
+function remapError(e) {
+  if (!rangeMap) { return e; }
+  function fix(text) {
+    return String(text).replace(/^(\d+):(\d+)/, function (all, line, col) {
+      var m = rangeMap.map(Number(line), Number(col), Number(line), Number(col) + 1);
+      return m ? m.sLine + ":" + m.sColumn : all;
+    });
+  }
+  if (typeof e === "string") { return fix(e); }
+  if (e && typeof e.message === "string") { try { e.message = fix(e.message); } catch (err) {} }
+  return e;
+}
+
 function submitDebuggerState() {
+  var prev = cppdebugger.prevNode;
   this.postMessage(JSON.stringify({type: "debuginfo",
     variables: cppdebugger.variable(),
-    node: cppdebugger.nextNode(),
+    frames: collectFrames(),
+    node: remapNode(cppdebugger.nextNode()),
+    // The node that ran just before this pause -> the "just executed" line.
+    prevLine: prev && typeof prev.sLine === "number" ? prev.sLine : null,
+    // What was just computed at this pause (for Step Expression), e.g. arr[i] -> 2.
+    evaluated: describeLastEval(),
     frameManager: frameManager}));
 }
 
@@ -653,7 +759,10 @@ function qualifiedContinue() {
 }
 
 function qualifiedNext() {
-  if (cppdebugger.next() === false) {
+  var result = cppdebugger.next();
+  // Skip the generated pieces of a range-based for loop (the hidden __rf index counting up).
+  while (result === false && isSyntheticPause()) { result = cppdebugger.next(); }
+  if (result === false) {
     submitDebuggerState();
   } else {
     submitFrameManager();
@@ -674,8 +783,19 @@ function enableAll() {
 }
 
 function messageHandler(event) {
+  try {
+    handleMessage(event);
+  } catch (e) {
+    throw remapError(e);
+  }
+}
+
+function handleMessage(event) {
   if (event.data.type === "code") {
-    var code = event.data.code;
+    var rewritten = RangeFor.transformWithMap(event.data.code);
+    rangeMap = rewritten.changed ? rewritten : null;
+    var code = rewritten.code;
+    debuggingOn = true;
     setPinKeyframes(event.data.pinKeyframes);
     var debugging = event.data.debugging;
     boardType = event.data.boardType || null;
@@ -692,18 +812,23 @@ function messageHandler(event) {
     cppdebugger = JSCPP.run(code, "", config);
 
     if (config.debug) {
+      var interp = cppdebugger.rt.interp;
+      // Extra pauses after compound expressions finish (for Step Expression's values).
+      interp.yieldComposites = true;
+      // Line stepping and breakpoints ignore those extra pauses.
+      cppdebugger.conditions["lineChanged"] = function (prev, next) {
+        if (interp.compositeYield) { return false; }
+        return (prev != null ? prev.sLine : void 0) !== next.sLine;
+      };
       cppdebugger.conditions["breakpoints"] = function (prev, next) {
-        var previous = lastLine;
-        lastLine = next.sLine;
-        if (breakpoints.includes(next.sLine) && previous !== next.sLine) {
-          return true;
-        } else {
-          return false;
-        }
+        if (interp.compositeYield) { return false; }
+        // Stop when arriving at a breakpoint line from a different line (not on every piece of it).
+        return breakpoints.includes(next.sLine) && (prev == null || prev.sLine !== next.sLine);
       };
 
       cppdebugger.stopConditions["breakpoints"] = true;
-      setLineByLine(false);
+      // "Step from start": pause on every new line from the very beginning, no breakpoint needed.
+      setLineByLine(!!event.data.stepFromStart);
 
       qualifiedContinue();
     } else {
@@ -717,6 +842,8 @@ function messageHandler(event) {
     }
     if (event.data.action === "continue") {
       setLineByLine(false);
+      // Step Line turns breakpoints off for its own step; Continue has to turn them back on.
+      cppdebugger.stopConditions["breakpoints"] = debuggingOn;
       qualifiedContinue();
     }
     else if (event.data.action === "stepLine") {
@@ -728,6 +855,7 @@ function messageHandler(event) {
       qualifiedNext();
     }
     else if (event.data.action === "enabled") {
+      debuggingOn = !!event.data.state;
       if (event.data.state) {
         enableAll();
       } else {
