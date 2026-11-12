@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giffer Reborn</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-2203">
-  <link rel="stylesheet" href="css/main.css?v=2026.11.11-2203">
-  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-2203">
-  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-2203">
+  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-2214">
+  <link rel="stylesheet" href="css/main.css?v=2026.11.11-2214">
+  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-2214">
+  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-2214">
 </head>
 <body>
 <nav class="navbar sticky-top navbar-light bg-light">
@@ -100,8 +100,7 @@
                   </div>
                   <div class="tab-pane fade" id="debug" role="tabpanel" aria-labelledby="edit-tab">
                     <div id="debugging-buttons">
-                      <button class="btn btn-success" onclick="debug.startStepping()" title="Run your code and pause on the very first line. No breakpoint needed.">&#9654; Step from Start</button>
-                      <span class="dbg-toolbar-note">The step buttons appear in the top bar while you debug, so the board stays in view. Keys: F10 Step Line, F11 Step Expression, F5 Continue.</span>
+                      <span class="dbg-toolbar-note">Press <strong>Step from Start</strong> in the top bar to begin. The step buttons appear there while you debug, so the board stays in view. Keys: F10 Step Line, F11 Step Expression, F5 Continue.</span>
                     </div>
                     <div class="custom-control custom-checkbox">
                       <input class="custom-control-input" type="checkbox" id="debug-predict" onchange="debug.togglePredict()">
@@ -115,7 +114,7 @@
                     <div id="debug-predict-banner" class="dbg-predict-banner" style="display: none;"></div>
                     <div id="debug-trail" style="display: none;"></div>
                     <div id="debug-frames">
-                      <p class="dbg-empty">Press <strong>Step from Start</strong>, or click a line number to set a breakpoint and press Run. Your variables will show up here while the code is paused.</p>
+                      <p class="dbg-empty">Press <strong>Step from Start</strong> in the top bar, or click a line number to set a breakpoint and press Run. Your variables will show up here while the code is paused.</p>
                     </div>
                   </div>
                   <div class="tab-pane fade" id="dev" role="tabpanel" aria-labelledby="dev-tab">
@@ -248,7 +247,7 @@
         To see what your code is expected to do, click the green "Run & Grade" button at the top.<br>
         <br><br>
         <h4>Debugging</h4>
-        Press <strong>Step from Start</strong> (top bar, or the "Debugging" tab) to pause on the first line of your code. While you debug, the step buttons sit in the top bar so the board stays in view.<br>
+        Press <strong>Step from Start</strong> (top bar) to pause on the first line of your code. While you debug, the step buttons sit in the top bar so the board stays in view.<br>
         <strong>Step Line</strong> (F10) runs your code one line at a time.<br>
         A <span style="color:#43a047;font-weight:bold">green arrow</span> marks the line that just ran, and a <span style="color:#e53935;font-weight:bold">red arrow</span> marks the next line to run.<br>
         Each function call gets its own box of variables. Values that just changed light up yellow.<br>
@@ -527,23 +526,23 @@ int main() {
 
 <div id="highlight-storage" style="display: none; width: 0.01px; height: 0.01px;"></div>
 
-<script src="js/jquery-2.2.1.min.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap.bundle.min.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/ace/ace.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/FrameManager.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/gif/gif.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/FileSaver.min.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/clipboard.min.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/highlight.pack.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/errorHints.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/formatter.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/quizChunks.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/Debugger.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/three.min.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/OrbitControls.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/Board.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/terminal.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
-<script src="js/main.js?v=2026.11.11-2203" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.2.1.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap.bundle.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ace.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/FrameManager.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/gif/gif.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/FileSaver.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/clipboard.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/highlight.pack.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/errorHints.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/formatter.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/quizChunks.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/Debugger.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/three.min.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/OrbitControls.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/Board.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/terminal.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
+<script src="js/main.js?v=2026.11.11-2214" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>
