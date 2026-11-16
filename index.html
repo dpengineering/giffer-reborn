@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Giffer Reborn</title>
-  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.11-2245">
-  <link rel="stylesheet" href="css/main.css?v=2026.11.11-2245">
-  <link rel="stylesheet" href="css/terminal.css?v=2026.11.11-2245">
-  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.11-2245">
+  <link rel="stylesheet" href="css/bootstrap.min.css?v=2026.11.14-1216">
+  <link rel="stylesheet" href="css/main.css?v=2026.11.14-1216">
+  <link rel="stylesheet" href="css/terminal.css?v=2026.11.14-1216">
+  <link rel="stylesheet" href="css/styles/androidstudio.css?v=2026.11.14-1216">
 </head>
 <body>
 <nav class="navbar sticky-top navbar-light bg-light">
@@ -126,6 +126,9 @@
                     <button class="btn btn-secondary" onclick="showThemes()">Customize Theme</button>
                     <button class="btn btn-secondary" onclick="showRandomChunk()">Random Chunk</button>
                     <hr>
+                    <div class="code-chunks-title">Code Chunks <span class="text-muted">drag one into your code, or click to put it at your cursor</span></div>
+                    <div id="code-chunks" class="code-chunks"><!-- filled by js/codeChunks.js --></div>
+                    <hr>
      
                     <div class="form-group">
                       <input type="text" id="passphrase" class="form-control" placeholder="Enter your secret phrase">
@@ -241,7 +244,7 @@
         <strong>To see this window again, click "Show Help" under "Tools".</strong><br>
         <br><br>
         <h4>Working with exercises</h4>
-        To load an exercise, type the exercise number into the exercise field and press load.<br>
+        Type your <strong>name</strong> first, then type the exercise number into the exercise field and press load. Exercises won't load without a name, because your name picks your own timings!<br>
         Some exercises provide some starting code! Be sure to load the exercise before you start working.<br>
         If you want to edit the board, or experiment, you should "Clear Exercise".<br>
         To see what your code is expected to do, click the green "Run & Grade" button at the top.<br>
@@ -254,6 +257,9 @@
         Click next to a line number to add a breakpoint, then <strong>Continue</strong> (F5) skips ahead to it. <strong>Stop</strong> (Shift+F5) finishes the run without pausing.<br>
         <strong>Step Expression</strong> (F11) runs one piece of a line at a time and lists each value it computes, like <code>arr[i] &rarr; 2</code>.<br>
         <strong>Step Back</strong> (Shift+F10) goes back one step. Turn on <strong>Predict first</strong> to guess each new value before it's shown.<br>
+        <br><br>
+        <h4>Code Chunks</h4>
+        Under <strong>Tools</strong>, drag a code chunk (like a for loop that repeats 5 times) into your code, or click it to put it at your cursor.<br>
         <br><br>
         <h4>Submitting</h4>
         Once you've solved an exercise, save your code in the Google Doc provided by your teacher.<br>
@@ -548,24 +554,27 @@ int main() {
 
 <div id="highlight-storage" style="display: none; width: 0.01px; height: 0.01px;"></div>
 
-<script src="js/jquery-2.2.1.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/bootstrap.bundle.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/ace/ace.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/FrameManager.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/gif/gif.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/FileSaver.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/clipboard.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/highlight.pack.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/errorHints.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/themeCustomizer.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/formatter.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/quizChunks.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/Debugger.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/three.min.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/OrbitControls.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/Board.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/terminal.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
-<script src="js/main.js?v=2026.11.11-2245" type="text/javascript" charset="utf-8"></script>
+<script src="js/jquery-2.2.1.min.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/bootstrap.bundle.min.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/ace/ace.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/FrameManager.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/gif/gif.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/FileSaver.min.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/clipboard.min.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/highlight.pack.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/errorHints.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/themeCustomizer.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/formatter.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/quizChunks.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/exerciseTemplate.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/confetti.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/codeChunks.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/Debugger.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/three.min.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/OrbitControls.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/Board.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/terminal.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
+<script src="js/main.js?v=2026.11.14-1216" type="text/javascript" charset="utf-8"></script>
 
 </body>
 </html>

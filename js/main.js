@@ -294,6 +294,9 @@ function applyTheme() {
   ThemeCustomizer.save(editorTheme);
 }
 
+// Drag-and-drop code chunks in the Tools tab (js/codeChunks.js)
+CodeChunks.init(editor, "code-chunks");
+
 //Debug
 var debug = new Debugger(editor);
 // Remember the "Predict first" checkbox between visits.
@@ -306,6 +309,23 @@ var boardField = document.getElementById("board");
 
 nameField.value = getFromStorage("name");
 exerciseField.value = getFromStorage("exercise-number");
+// Exercises need a name (it picks the student's timings and secret letters).
+function studentName() { return nameField.value.trim(); }
+nameField.addEventListener("input", function () {
+  nameField.classList.remove("is-invalid");
+  updateSecretButton();
+});
+nameField.addEventListener("change", function () {
+  setToStorage("name", nameField.value);
+  if (!studentName()) { return; }
+  if (waitingForName) {
+    // They tried to load an exercise before typing their name.
+    waitingForName = false;
+    loadExercise(true);
+  } else if (currentExercise.template && currentExercise.template.vars) {
+    personalizeExercise(true);
+  }
+});
 exerciseField.onkeyup = function (e) {
   if (e.keyCode === 13) {
     loadExercise(true);
@@ -508,6 +528,27 @@ function decodeWord(encodedWord, passphrase) {
 var selectedPhrase = "NULLNULLNULLNULLNULL";
 var startingEx = 30;
 
+// A student's phrase depends only on their name (exactly as typed, like it always has).
+function phraseForName(name) {
+  return phrases[Math.abs(toHash(name) % phrases.length)];
+}
+
+// Names that have run and graded an exercise in this browser. Decode Phrase works for these
+// straight away, without pressing Obtain Secret first.
+var SECRET_NAMES_KEY = "giffer-secret-names";
+function secretNames() {
+  try { return JSON.parse(localStorage.getItem(SECRET_NAMES_KEY)) || []; } catch (e) { return []; }
+}
+function hasRunWithName(name) {
+  return secretNames().indexOf(name) !== -1;
+}
+function rememberSecretName(name) {
+  if (!name.trim() || hasRunWithName(name)) { return; }
+  var names = secretNames();
+  names.push(name);
+  try { localStorage.setItem(SECRET_NAMES_KEY, JSON.stringify(names.slice(-20))); } catch (e) {}
+}
+
 // Add event listener to the "Decode Word" button
 document.getElementById("decode-word-button").addEventListener("click", function () {
   // Get the current name input value
@@ -530,10 +571,16 @@ document.getElementById("decode-word-button").addEventListener("click", function
   try {
     const decodedWord = decodeWord(passphraseCleaned, nameInput);
 
-    if (selectedPhrase === "NULLNULLNULLNULLNULL") {
-      alert("Please run an exercise first to obtain the secret phrase.");
+    const rawName = document.getElementById("name").value;
+    if (!rawName.trim()) {
+      alert("Type your name in the Name box (Controls tab) first.");
       return;
     }
+    if (!hasRunWithName(rawName)) {
+      alert("Run and grade any exercise with your name filled in first, then come back and press Decode Phrase.");
+      return;
+    }
+    selectedPhrase = phraseForName(rawName);
 
     // Ensure both strings are the same length
     if (decodedWord.length !== selectedPhrase.length) {
@@ -552,17 +599,13 @@ document.getElementById("decode-word-button").addEventListener("click", function
     // Display the differing indices
     if (differingIndices.length === 0) {
       document.getElementById("passphrase").value = decodedWord;
-      alert("Woohoo! Your decoded secret phrase is:\n" + decodedWord);
+      Confetti.celebrate(decodedWord);   // js/confetti.js
 
       const celebration = document.getElementById("celebration-animation");
-
-      // Trigger the celebration animation
       celebration.style.display = "block";
-
-      // Hide the element after the animation ends
       celebration.addEventListener("animationend", () => {
         celebration.style.display = "none";
-      });
+      }, { once: true });
     } else {
       alert("Please revisit exercise(s): " + differingIndices.join(", "));
     }
@@ -585,9 +628,13 @@ new Clipboard("#obtain-secret", {
 
     // Access the name input value
     var nameInput = document.getElementById("name").value;
+    if (!nameInput.trim()) {
+      println("Type your name in the Name box first. No name, no secret!", "red");
+      showOutput();
+      return undefined;
+    }
     var exerciseNum = currentExercise.number;
-    var hashedVal = toHash(nameInput);
-    selectedPhrase = phrases[Math.abs(hashedVal % phrases.length)];
+    selectedPhrase = phraseForName(nameInput);
 
     if (exerciseNum >= startingEx){
       var encoded = encodeWord(selectedPhrase.toUpperCase(), nameInput.toUpperCase());
@@ -671,10 +718,18 @@ function JSCPPToAce(line) {
   return offset + line;
 }
 //Navbar Buttons
+// Obtain Secret only shows after a correct Run and Grade, and only with a name typed in.
+var lastGradeCorrect = false;
+var secretAllowed = false;
+function updateSecretButton() {
+  var show = secretAllowed && lastGradeCorrect && currentExercise.number !== null && !!studentName();
+  copyPage.style.display = show ? "block" : "none";
+}
 function setButtons(runText, runEnabled, copyVisible, finishVisible) {
   runButton.innerHTML = runText;
   runButton.disabled = !runEnabled;
-  copyPage.style.display = copyVisible ? "block" : "none";
+  secretAllowed = !!copyVisible;
+  updateSecretButton();
   // While debugging, the step controls live in the top bar (the board stays visible in its tab).
   debugToolbar.style.display = finishVisible ? "flex" : "none";
   stepStartButton.style.display = runEnabled ? "" : "none";
@@ -691,7 +746,9 @@ function setRunning(v) {
       setButtons("Running...", false, false, false);
     }
   } else {
-    if (currentExercise.number !== null) {
+    if (currentExercise.number !== null && !currentExercise.frameManager) {
+      setButtons("Preparing exercise...", false, false, false);   // personalizeExercise is still working
+    } else if (currentExercise.number !== null) {
       setButtons("Run and Grade", true, true, false);
     } else {
       setButtons("Run", true, false, false);
@@ -704,6 +761,11 @@ function runCode(callback) {
   if (running) {
     return;
   }
+  if (currentExercise.number !== null && !currentExercise.frameManager && typeof callback !== "function") {
+    setStatus("Still preparing Exercise " + currentExercise.number + " . . .", "info", true);
+    return;
+  }
+  lastGradeCorrect = false;
   setRunning(true);
   if (typeof Terminal1337 !== "undefined") Terminal1337.onRunStart(); // hidden terminal (js/terminal.js)
   // This line changes the HTML paragraph above the Output GIF.
@@ -738,6 +800,8 @@ function runCode(callback) {
       if (shouldGrade) {
         setStatus("Grading . . .", "success", true);
         newFrameManager.grade(currentExercise);
+        lastGradeCorrect = newFrameManager.grade === true;
+        rememberSecretName(nameField.value);
       }
 
       setStatus("Generating Gif . . .", "success", true);
@@ -749,7 +813,7 @@ function runCode(callback) {
         Terminal1337.onGraded(currentExercise.number, newFrameManager.grade === true); // hidden terminal (js/terminal.js)
       }
 
-      if (typeof callback !== "undefined") {
+      if (typeof callback === "function") {   // (Ctrl-Enter passes the editor here)
         callback(lastContent);
       }
 
@@ -843,14 +907,13 @@ function showFriendlyError(rawMessage) {
 // }
 
 function overwriteCode(includeComments = false) {
-  let code = currentExercise.startingCode;
+  let code = currentExercise.startingCode || "";
 
   if (!includeComments) {
-    // Remove everything after // on a line
-    code = code.replace(/\/\/.*$/gm, "");
+    code = currentExercise.startingCodeBare || ExerciseTemplate.stripComments(code);
   }
 
-  editor.setValue(code.trim());
+  editor.setValue(code.trim(), -1);
   try { editor.resize(); } catch (e) {}
 }
 
@@ -879,9 +942,10 @@ function formatCode() {
 }
 
 
-function clearExercise() {
-  setStatus("Exercise not found.  Gifs will not be graded.", "");
+function clearExercise(message) {
+  setStatus(message || "Exercise not found.  Gifs will not be graded.", "");
   currentExercise = { number: null, suffix: defaultSuffix };
+  lastGradeCorrect = false;
   setButtons("Run", true, false, false);
 
   document.getElementById("correct-section").style.display = "none";
@@ -1017,6 +1081,8 @@ function fetchExercise(promptForOverwrite, fetchButtonStatus) {
 }
 
 // The following function grabs local files in a carefully-organized directory and chunks them into forms in the Giffer Reborn site proper.
+var waitingForName = false;   // Load was pressed with no name; loads once a name is typed
+var exerciseLoadId = 0;       // ignores an older load that finishes after a newer one
 function loadExercise(promptForOverwrite) {
 
   setStatus("Getting grading file . . .", "info", true);
@@ -1026,57 +1092,86 @@ function loadExercise(promptForOverwrite) {
   var exerciseNum = parseInt($("#exercise-number")[0].value);
   if (typeof Terminal1337 !== "undefined") Terminal1337.onExerciseLoaded(exerciseNum); // hidden terminal (js/terminal.js)
   if (isNaN(exerciseNum)) {
+    waitingForName = false;
     clearExercise();
     return;
   }
+
+  // No name = no exercise: the name picks this student's timings and secret letters.
+  if (!studentName()) {
+    waitingForName = true;
+    clearExercise("Type your name in the Name box first, then Exercise " + exerciseNum + " will load.");
+    nameField.classList.add("is-invalid");
+    $("#control-tabs a[href=\"#controls\"]").tab("show");
+    nameField.focus();
+    return;
+  }
+  waitingForName = false;
 
   console.log("Loading Exercise " + exerciseNum + "...");
 
     // Dynamically load the CSS file for exercises
     function loadCSS(href) {
+      if (document.querySelector('link[data-exercise-css]')) { return; }
       var link = document.createElement("link");
       link.rel = "stylesheet";
       link.type = "text/css";
       link.href = href;
+      link.setAttribute("data-exercise-css", "");
       document.head.appendChild(link);
     }
   
     loadCSS("./css/exercise-directions.css");
+
+  var loadId = ++exerciseLoadId;
 
   // This bad boy is only looking for a .FrameManager file!
   var xmlhttp = new XMLHttpRequest();
   xmlhttp.open("GET", "exercises/" + $("#exercise-number")[0].value + "/Exercise_" + exerciseNum + ".FrameManager");
 
   var handleError = function () {
-    clearExercise();
+    if (loadId === exerciseLoadId) { clearExercise(); }
   };
 
   xmlhttp.onerror = handleError;
   xmlhttp.onabort = handleError;
   xmlhttp.ontimeout = handleError;
   xmlhttp.onload = function () {
+    if (loadId !== exerciseLoadId) { return; }
     if (this.status === 200) { // Success!
       var data = JSON.parse(this.responseText);
       document.getElementById("correct-section").style.display = "block";
+      lastGradeCorrect = false;
       if (!data.board) {
         //This is a FrameManager--not an exercise.
-        currentExercise.frameManager = makeFrameManager(JSON.parse(this.responseText));
-        currentExercise.number = exerciseNum;
-        currentExercise.suffix = defaultSuffix;
+        currentExercise = { number: exerciseNum, suffix: defaultSuffix, frameManager: makeFrameManager(data) };
 
         loadDefaultBoard();
 
         console.log("Just a humble FrameManager.")
 
       } else {
-        console.log("Full package.")
-        console.log(currentExercise);
-        currentExercise.number = exerciseNum;
-        currentExercise.board = data.board;
-        currentExercise.startingCode = data.startingCode;
-        currentExercise.suffix = data.suffix;
-        currentExercise.frameManager = makeFrameManager(data.frameManager);
-        currentExercise.directions = data.directions;
+        currentExercise = {
+          number: exerciseNum,
+          board: data.board,
+          suffix: data.suffix,
+          // version 2 files (tools/build-exercise.js) are templates filled in per student
+          template: data.version >= 2 ? {
+            startingCode: data.startingCode,
+            startingCodeBare: data.startingCodeBare,
+            directions: data.directions,
+            vars: data.vars || null,
+            answerKey: data.answerKey || null
+          } : null,
+          startingCode: data.startingCode,
+          directions: data.directions,
+          frameManager: data.frameManager ? makeFrameManager(data.frameManager) : null
+        };
+
+        loadBoardFromExercise(currentExercise);
+        if (currentExercise.template) {
+          personalizeExercise(false);
+        }
 
         document.getElementById("export-exercise-number").value = currentExercise.number;
         document.getElementById("export-exercise-starting").value = currentExercise.startingCode;
@@ -1089,8 +1184,6 @@ function loadExercise(promptForOverwrite) {
         } else {
           document.getElementById("directions-content").innerText = "No directions provided for this Exercise";
         }
-
-        loadBoardFromExercise(currentExercise);
 
         for (var i = 0; i < currentBoard.DOMKeyframes.length; i++) {
           var keyframe = $(currentBoard.DOMKeyframes[i]);
@@ -1106,11 +1199,12 @@ function loadExercise(promptForOverwrite) {
           $("#overwrite-modal").modal('show');
         }
       }
-      //set code to exercise start code?
-      setStatus("Exercise " + exerciseNum + " loaded! Press Run and Grade to test your code.", "success", false);
-
-      setButtons("Run and Grade", true, false, false);
       try { editor.resize(); } catch (e) {}
+      if (currentExercise.frameManager) {
+        //set code to exercise start code?
+        setStatus("Exercise " + exerciseNum + " loaded! Press Run and Grade to test your code.", "success", false);
+        setButtons("Run and Grade", true, false, false);
+      }
 
     } else {
       handleError();
@@ -1118,6 +1212,67 @@ function loadExercise(promptForOverwrite) {
   };
 
   xmlhttp.send();
+}
+
+// Fills a version 2 exercise in for the student's name: their own timings in the directions
+// and starting code, and (for exercises with //@vary) their own correct answer to grade against.
+function personalizeExercise(nameChanged) {
+  var ex = currentExercise, t = ex.template;
+  var values = t.vars ? ExerciseTemplate.pickValues(t.vars, studentName(), ex.number) : {};
+  ex.values = values;
+  ex.startingCode = ExerciseTemplate.fill(t.startingCode, values);
+  ex.startingCodeBare = ExerciseTemplate.fill(t.startingCodeBare || ExerciseTemplate.stripComments(t.startingCode), values);
+  ex.directions = ExerciseTemplate.fill(t.directions, values);
+  if (nameChanged) {
+    document.getElementById("directions-content").innerHTML = ex.directions || "";
+  }
+  if (!t.answerKey) { return; }
+
+  // Run this student's version of the answer key to get the gif they're graded against.
+  ex.frameManager = null;
+  lastGradeCorrect = false;
+  setButtons("Preparing exercise...", false, false, false);
+  setStatus("Preparing Exercise " + ex.number + " for " + studentName() + " . . .", "info", true);
+  var answer = ExerciseTemplate.fill(ExerciseTemplate.decode(t.answerKey), values);
+  runAnswerKey(answer, ex.suffix).then(function (fm) {
+    if (currentExercise !== ex || ex.values !== values) { return; }   // a newer load or name took over
+    fm.isGraded = true;
+    fm.grade = true;
+    ex.frameManager = fm;
+    setStatus(nameChanged
+      ? "Exercise " + ex.number + " updated for " + studentName() + ". Your timings changed, so check the Tips & Tricks (or press Load for fresh starting code)."
+      : "Exercise " + ex.number + " loaded! Press Run and Grade to test your code.", "success", false);
+    if (!running) { setButtons("Run and Grade", true, false, false); }
+  }, function (err) {
+    if (currentExercise !== ex) { return; }
+    console.error("[giffer] answer key failed:", err);
+    setStatus("Couldn't prepare Exercise " + ex.number + ". Tell your teacher (answer key error).", "danger", false);
+  });
+}
+
+// Runs code in its own interpreter worker (not the student's) and resolves with the FrameManager.
+function runAnswerKey(code, suffix) {
+  return new Promise(function (resolve, reject) {
+    var worker = new Worker("js/JSCPP-WebWorker.js" + ASSET_VERSION);
+    var timer = setTimeout(function () { worker.terminate(); reject(new Error("timed out")); }, 20000);
+    worker.onmessage = function (e) {
+      var message = JSON.parse(e.data);
+      if (message.type === "frameManager") {
+        clearTimeout(timer);
+        worker.terminate();
+        resolve(makeFrameManager(JSON.parse(message.frameManager)));
+      }
+    };
+    worker.onerror = function (e) {
+      clearTimeout(timer);
+      worker.terminate();
+      e.preventDefault();
+      reject(new Error(e.message));
+    };
+    currentBoard.updateInputs();
+    worker.postMessage({ type: "code", code: currentPrefix + code + (suffix || defaultSuffix), pinKeyframes: currentBoard.pinKeyframes,
+                         debugging: false, stepFromStart: false, boardType: currentBoard.type });
+  });
 }
 function wipeExercise() {
   exerciseField.value = "";
@@ -1397,7 +1552,8 @@ function saveContext() {
   currentBoard.updateInputs();
   setToStorage("board-setup", JSON.stringify(currentBoard.getSetup()));
   setToStorage("code", editor.getValue());
-  setToStorage("exercise-number", currentExercise.number === null ? "" : currentExercise.number);
+  // While waiting for a name, keep the number they typed so it loads next time.
+  setToStorage("exercise-number", currentExercise.number === null ? (waitingForName ? exerciseField.value : "") : currentExercise.number);
 }
 
 function saveExercise() {

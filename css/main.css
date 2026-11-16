@@ -403,3 +403,80 @@ div.form-group label {
 .theme-color-reset:hover { color: #000; }
 .theme-preview-label { font-weight: bold; font-size: 0.9rem; margin-bottom: 5px; }
 #theme-preview { height: 62vh; min-height: 300px; border-radius: 6px; border: 1px solid #dde; }
+
+/* ---------- Code chunks (js/codeChunks.js) ---------- */
+.code-chunks-title { font-weight: 600; margin-bottom: 6px; }
+.code-chunks-title .text-muted { font-weight: normal; font-size: 0.85em; }
+.code-chunks { display: flex; flex-wrap: wrap; gap: 10px; }
+.code-chunk {
+  --chunk-color: #4c97ff;
+  position: relative;
+  cursor: grab;
+  user-select: none;
+  min-width: 190px;
+  padding: 6px 10px 8px 14px;
+  border-radius: 8px;
+  background: var(--chunk-color);
+  color: #fff;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.22);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+/* the Scratch-style notch on top */
+.code-chunk::before {
+  content: "";
+  position: absolute;
+  top: -5px; left: 18px;
+  width: 26px; height: 8px;
+  border-radius: 0 0 6px 6px;
+  background: var(--chunk-color);
+  filter: brightness(1.12);
+}
+.code-chunk:hover, .code-chunk:focus { transform: translateY(-2px); box-shadow: 0 5px 0 rgba(0, 0, 0, 0.22); outline: none; }
+.code-chunk:active { cursor: grabbing; }
+.code-chunk-dragging { opacity: 0.5; }
+.code-chunk-label { font-weight: 700; font-size: 0.9rem; margin-bottom: 4px; }
+.code-chunk-code {
+  margin: 0;
+  padding: 4px 6px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.18);
+  color: #fff;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  white-space: pre;
+}
+/* where a dragged chunk will land, and a flash once it's in */
+.ace_editor .chunk-drop-line { position: absolute; border-top: 3px solid #4c97ff; }
+.ace_editor .chunk-drop-line.chunk-drop-after { border-top: none; border-bottom: 3px solid #4c97ff; }
+.ace_editor .chunk-inserted { position: absolute; background: rgba(76, 151, 255, 0.22); }
+
+/* ---------- Secret phrase celebration (js/confetti.js) ---------- */
+.confetti-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2000; }
+.confetti-banner {
+  position: fixed; inset: 0; z-index: 1999;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(20, 20, 40, 0.45);
+  animation: confetti-fade 0.3s ease;
+}
+.confetti-banner.confetti-leaving { opacity: 0; transition: opacity 0.3s ease; }
+.confetti-card {
+  background: #fff; color: #222;
+  border-radius: 16px;
+  padding: 26px 34px;
+  max-width: 92vw;
+  text-align: center;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+  animation: confetti-pop 0.5s cubic-bezier(.2, 1.6, .4, 1);
+}
+.confetti-title { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; }
+.confetti-label { color: #666; margin-bottom: 8px; }
+.confetti-phrase { font-family: monospace; font-size: 1.6rem; font-weight: 700; letter-spacing: 2px; word-break: break-all; margin-bottom: 18px; }
+.confetti-phrase span { display: inline-block; color: #4c97ff; animation: confetti-letter 0.5s ease both; }
+.confetti-phrase span:nth-child(3n+2) { color: #f15bb5; }
+.confetti-phrase span:nth-child(3n) { color: #43aa8b; }
+@keyframes confetti-fade { from { opacity: 0; } }
+@keyframes confetti-pop { from { transform: scale(0.4); opacity: 0; } }
+@keyframes confetti-letter { from { transform: translateY(-30px) rotate(-20deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .confetti-card, .confetti-phrase span, .confetti-banner { animation: none; }
+}
